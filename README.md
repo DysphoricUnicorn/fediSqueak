@@ -2,13 +2,13 @@
 
 A fediverse client made primarily for use with GoToSocial instances.  
 Build in React Native for iOS and Android.  
-Very work in progress.
+Very much work in progress.
 
 ## Reasoning
 
 Most clients available for mobile devices are made primarily for use with Mastodon. This leads to annoying bugs when encountering the things
 that GoToSocial does differently than Mastodon.  
-Also, my favourite Mastodon client seems to no longer be in active development, so I can not hope on its developer to fix any bugs in it, no
+Also, my favourite Mastodon client seems to no longer be in active development, so I can not hope that its developer fixes any bugs in it, no
 matter if they relate to GoToSocial or not.
 
 ## Naming
