@@ -1,20 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import styled from 'styled-components/native';
+import {ConfigurationProvider} from './src/data/ConfigurationContext';
+import Root from './src/views/Root';
+
+const MainView = styled.View`
+  background-color: black;
+  color: white;
+`;
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    return (
+        <MainView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <ConfigurationProvider>
+                <Root/>
+            </ConfigurationProvider>
+        </MainView>
+    );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

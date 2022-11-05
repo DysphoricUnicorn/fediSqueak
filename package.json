@@ -1,6 +1,6 @@
 {
   "name": "fedisqueak",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -9,13 +9,21 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.10",
     "expo": "~46.0.16",
+    "expo-auth-session": "^3.7.1",
+    "expo-random": "^12.3.0",
     "expo-status-bar": "~1.4.0",
+    "expo-web-browser": "^11.0.0",
     "react": "18.0.0",
-    "react-native": "0.69.6"
+    "react-native": "0.69.6",
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.12.9",
+    "@binary-butterfly/eslint-config": "^0.0.5",
+    "expo-dev-client": "^1.3.1",
+    "prop-types": "^15.8.1"
   },
   "private": true
 }
