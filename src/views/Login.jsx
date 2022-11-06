@@ -3,17 +3,12 @@ import {Button} from 'react-native';
 import styled from 'styled-components/native';
 import {callApi} from '../helpers/apiHelper';
 import PropTypes from 'prop-types';
+import {decodeHtmlEntities} from '../helpers/generalHelpers';
 
 const InstanceLogo = styled.Image`
   width: 50px;
   height: 50px;
 `;
-
-const decodeHtmlEntities = (str) => {
-    return (str?.replace(/&#(\d+);/g, function (match, dec) {
-        return String.fromCharCode(dec);
-    })) ?? '';
-};
 
 const Login = (props) => {
     const {instance, instanceInfo, setInstanceInfo, setRegisteredApp} = props;

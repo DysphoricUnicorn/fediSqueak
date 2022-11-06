@@ -1,8 +1,8 @@
-import Timeline from './Timeline';
 import WaitingForLogin from './WaitingForLogin';
 import Login from './Login';
 import InstanceSelection from './InstanceSelection';
 import {useConfigurationContext} from '../data/ConfigurationContext';
+import ContentBase from '../components/ContentBase';
 
 const Root = () => {
     const {
@@ -19,7 +19,7 @@ const Root = () => {
     return instanceInfo.fetched
         ? registeredApp.registered
             ? oauthToken !== ''
-                ? <Timeline instanceInfo={instanceInfo} registeredApp={registeredApp} oauthToken={oauthToken}/>
+                ? <ContentBase instanceInfo={instanceInfo} registeredApp={registeredApp} oauthToken={oauthToken}/>
                 : <WaitingForLogin registeredApp={registeredApp}
                                    instanceInfo={instanceInfo}
                                    setRegisteredApp={setRegisteredApp}
