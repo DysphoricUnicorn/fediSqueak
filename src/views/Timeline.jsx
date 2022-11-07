@@ -8,8 +8,7 @@ import CenteredAppText from '../components/CenteredAppText';
 import CenteredMaterialIcon from '../components/CenteredMaterialIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {callAuthenticated} from '../helpers/apiHelper';
-import {Button, RefreshControl, ScrollView, View} from 'react-native';
-import AccountImage from '../components/AccountImage';
+import {Button, RefreshControl} from 'react-native';
 import Post from '../components/Post';
 
 const OwnProfileImage = styled.Image`
@@ -19,7 +18,7 @@ const OwnProfileImage = styled.Image`
 
 const PostScrollView = styled.ScrollView`
   margin-bottom: 120px;
-`
+`;
 
 const Timeline = (props) => {
     const {account, oauthToken, instanceInfo} = props;
@@ -28,6 +27,11 @@ const Timeline = (props) => {
     const [posts, setPosts] = React.useState([]);
     const [refreshing, setRefreshing] = React.useState(true);
     const [loadingMore, setLoadingMore] = React.useState(true);
+    const [previousLast, setPreviousLast] = React.useState();
+
+    React.useEffect(() => {
+        AsyncStorage.getItem('previousLast' + currentTl).then((item) => setPreviousLast(item));
+    }, [currentTl]);
 
     React.useEffect(() => {
         AsyncStorage.getItem('posts' + currentTl).then((oldPosts) => {
@@ -58,10 +62,20 @@ const Timeline = (props) => {
     }, []);
 
     const fetchAndSetPosts = (route) => {
-                callAuthenticated(instanceInfo.uri, route, 'GET', oauthToken)
+        callAuthenticated(instanceInfo.uri, route, 'GET', oauthToken)
             .then((fetchedPosts) => {
                 setPosts((oldPosts) => {
                     const newPosts = [...fetchedPosts, ...oldPosts].sort((a, b) => a.id > b.id ? -1 : 1);
+                    const newPreviousLastId = fetchedPosts[fetchedPosts.length - 1]?.id;
+                    setPreviousLast(newPreviousLastId);
+                    if (newPreviousLastId) {
+                        AsyncStorage.setItem('previousLast' + currentTl, fetchedPosts[fetchedPosts.length - 1]?.id).catch((reason => {
+                            console.error('Could not set previousLast', reason);
+                        }));
+                    } else {
+                        AsyncStorage.removeItem('previousLast' + currentTl)
+                            .catch((reason => console.error('could not remote previousLast')));
+                    }
                     AsyncStorage.setItem('posts' + currentTl, JSON.stringify(newPosts)).catch((reason) => {
                         console.error('Could not store posts', reason);
                     });
@@ -75,7 +89,7 @@ const Timeline = (props) => {
                 setRefreshing(false);
                 setLoadingMore(false);
             });
-    }
+    };
 
     const handleRefresh = () => {
         setRefreshing(true);
@@ -86,10 +100,16 @@ const Timeline = (props) => {
         fetchAndSetPosts(route);
     };
 
-    const handleLoadMore = () => {
+    const handleLoadMore = (last, next) => {
         setLoadingMore(true);
         let route = '/api/v1/timelines/home?limit=200';
-        if (posts.length > 0) {
+
+        if (last) {
+            route += '&max_id=' + last;
+            if (next) {
+                route += '&min_id=' + next;
+            }
+        } else if (posts.length > 0) {
             route += '&max_id=' + posts[posts.length - 1].id;
         }
         fetchAndSetPosts(route);
@@ -99,6 +119,7 @@ const Timeline = (props) => {
         return <AppText>Fetching account...</AppText>;
     }
 
+    const sortedPosts = posts.sort((a, b) => a.created_at > b.created_at ? -1 : 1);
     return <>
         <TopBar title={currentTl}
                 subTitle={account.acct}
@@ -106,8 +127,20 @@ const Timeline = (props) => {
                 SubMenu={<TimelineSubMenu currentTl={currentTl} setCurrentTl={setCurrentTl}/>}/>
         <PostScrollView>
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
-            {posts.sort((a, b) => a.created_at > b.created_at ? -1 : 1).map((post) => {
-                return <Post post={post} key={post.id}/>;
+            {sortedPosts.map((post, index) => {
+                const renderPost = <Post post={post}
+                                         key={post.id + post.account.acct}
+                                         instanceInfo={instanceInfo}
+                                         oauthToken={oauthToken}
+                                         setPosts={setPosts}/>;
+                if (post.id === previousLast) {
+                    return <React.Fragment key={post.id + post.account.acct}>
+                        {renderPost}
+                        <Button title="load more" onPress={() => handleLoadMore(post.id, sortedPosts?.[index + 1]?.id)}
+                                disabled={loadingMore}/>
+                    </React.Fragment>;
+                }
+                return renderPost;
             })}
             <Button title="Load more" onPress={handleLoadMore} disabled={loadingMore}/>
         </PostScrollView>
