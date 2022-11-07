@@ -41,7 +41,7 @@ const Timeline = (props) => {
                 return Promise.reject();
             }
         }).catch(() => {
-            callAuthenticated(instanceInfo.uri, '/api/v1/timelines/home?limit=200', 'GET', oauthToken)
+            callAuthenticated(instanceInfo.uri, '/api/v1/timelines/home?limit=20', 'GET', oauthToken)
                 .then((newPosts) => {
                     if (newPosts) {
                         setPosts(newPosts);
@@ -93,7 +93,7 @@ const Timeline = (props) => {
 
     const handleRefresh = () => {
         setRefreshing(true);
-        let route = '/api/v1/timelines/home?limit=200';
+        let route = '/api/v1/timelines/home?limit=20';
         if (posts[0]) {
             route += '&since_id=' + posts[0].id;
         }
@@ -102,7 +102,7 @@ const Timeline = (props) => {
 
     const handleLoadMore = (last, next) => {
         setLoadingMore(true);
-        let route = '/api/v1/timelines/home?limit=200';
+        let route = '/api/v1/timelines/home?limit=20';
 
         if (last) {
             route += '&max_id=' + last;
@@ -133,7 +133,7 @@ const Timeline = (props) => {
                                          instanceInfo={instanceInfo}
                                          oauthToken={oauthToken}
                                          setPosts={setPosts}/>;
-                if (post.id === previousLast) {
+                if (post.id === previousLast && index !== posts.length - 1) {
                     return <React.Fragment key={post.id + post.account.acct}>
                         {renderPost}
                         <Button title="load more" onPress={() => handleLoadMore(post.id, sortedPosts?.[index + 1]?.id)}
@@ -142,7 +142,7 @@ const Timeline = (props) => {
                 }
                 return renderPost;
             })}
-            <Button title="Load more" onPress={handleLoadMore} disabled={loadingMore}/>
+            <Button title="Load more" onPress={() => handleLoadMore()} disabled={loadingMore}/>
         </PostScrollView>
     </>;
 };
