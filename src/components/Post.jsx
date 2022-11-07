@@ -148,10 +148,12 @@ const Post = (props) => {
         </PostMetadataView>
         <View>
             {readPost.spoiler_text && <>
-                <PostText>{parsePost(readPost.spoiler_text)}</PostText>
+                <PostText>{readPost.spoiler_text}</PostText>
                 <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>
             </>}
-            {cnShown && <PostText selectable={post.visibility !== 'private'}>{parsePost(post.content)}</PostText>}
+            {cnShown && <PostText selectable={post.visibility !== 'private'}>
+                {parsePost(post.content)}
+            </PostText>}
         </View>
         <PostInteractionView>
             <InteractionPressable onPress={() => console.log('not implemented')}>

@@ -1,11 +1,20 @@
+import HTML from 'html-parse-stringify';
+import React from 'react';
+import AST from '../components/AST';
+
 export const decodeHtmlEntities = (str) => {
-    return (str?.replace(/&#(\d+);/g, function (match, dec) {
-        return String.fromCharCode(dec);
-    })) ?? '';
+    return (str
+            ?.replace(/&#(\d+);/g, (match, dec) => {
+                return String.fromCharCode(dec);
+            }))
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, '\'')
+            .replace(/&amp;/g, '&')
+        ?? '';
 };
 
 export const parsePost = (str) => {
-    // TODO: this is not a good way to do this but it will do for the beginning. Replace with something better later.
-
-    return decodeHtmlEntities(str).replace(/<((p|\/?span))>/g, '').replace(/<((\/p)|(br ?\/?))>/g, '\n').replace(/&quot;/g, '"').replace(/&apos;/g, '\'');
-}
+    const decoded = decodeHtmlEntities(str);
+    const parsed = HTML.parse(decoded);
+    return parsed.map((parsedEntry, index) => <AST parsed={parsedEntry} key={index}/>);
+};
