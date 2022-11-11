@@ -30,19 +30,18 @@ const TinyPostImage = styled.Image`
   margin-right: 2px;
 `;
 
-const RebloggerName = styled(AppText)`
-  font-size: 15px;
-`;
-
 const PostDisplayName = styled(AppText)`
+  /* TODO: font size from device config! */
   font-size: 18px;
 `;
 
 const PostUserName = styled(AppText)`
+  /* TODO: font size from device config! */
   font-size: 14px;
 `;
 
 const PostTimeStamp = styled(AppText)`
+  /* TODO: font size from device config! */
   font-size: 12px;
 `;
 
@@ -58,6 +57,7 @@ const PostInteractionView = styled.View`
 
 const InteractionText = styled(AppText)`
   color: ${props => props.active ? '#ff00ff' : 'white'};
+  /* TODO: font size from device config! */
   font-size: 18px;
   padding: 2px;
 `;
@@ -67,6 +67,7 @@ const InteractionPressable = styled.Pressable`
 `;
 
 const PostText = styled(AppText)`
+  /* TODO: font size from device config! */
   font-size: 18px;
 `;
 
@@ -133,26 +134,26 @@ const Post = (props) => {
     return <PostView>
         {post.reblog && <PostMetadataView>
             <TinyPostImage source={{uri: post.account.avatar}}/>
-            <RebloggerName>
+            <PostText>
                 <MaterialIcon color="white" name="repeat"/>
-                {post.account.acct} boosted:
-            </RebloggerName>
+                {parsePost(post.account.acct, post.account.emojis)} boosted:
+            </PostText>
         </PostMetadataView>}
         <PostMetadataView>
             <PostImage source={{uri: readPost.account.avatar}}/>
             <PostNameContainer>
-                <PostDisplayName>{readPost.account.display_name}</PostDisplayName>
+                <PostDisplayName>{parsePost(readPost.account.display_name, readPost.account.emojis)}</PostDisplayName>
                 <PostUserName>{readPost.account.acct}</PostUserName>
                 <PostTimeStamp>{postCreationTime.toLocaleString()} {readPost.visibility}</PostTimeStamp>
             </PostNameContainer>
         </PostMetadataView>
         <View>
             {readPost.spoiler_text && <>
-                <PostText>{readPost.spoiler_text}</PostText>
+                <PostText>{parsePost(readPost.spoiler_text, post.emojis)}</PostText>
                 <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>
             </>}
             {cnShown && <PostText selectable={post.visibility !== 'private'}>
-                {parsePost(post.content)}
+                {parsePost(post.content, post.emojis)}
             </PostText>}
         </View>
         <PostInteractionView>

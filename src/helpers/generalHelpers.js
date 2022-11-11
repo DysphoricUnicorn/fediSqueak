@@ -13,8 +13,14 @@ export const decodeHtmlEntities = (str) => {
         ?? '';
 };
 
-export const parsePost = (str) => {
-    const decoded = decodeHtmlEntities(str);
+export const parsePost = (str, emoji = []) => {
+    let decoded = decodeHtmlEntities(str);
+    emoji.forEach((emojo) => {
+        const regex = new RegExp(':' + emojo.shortcode + ':', 'g')
+        decoded = decoded.replace(regex, '<img src="' + emojo.url + '" alt="' + emojo.shortcode + '">');
+        console.log(decoded, emojo, regex)
+    });
+
     const parsed = HTML.parse(decoded);
     return parsed.map((parsedEntry, index) => <AST parsed={parsedEntry} key={index}/>);
 };

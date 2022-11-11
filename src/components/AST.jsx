@@ -1,7 +1,8 @@
 import AppText from './AppText';
 import React from 'react';
 import styled from 'styled-components/native';
-import {Linking, Text} from 'react-native';
+import {Image, Linking, Text} from 'react-native';
+import Emojo from './Emojo';
 
 export const PostText = styled(AppText)`
   font-size: 18px;
@@ -57,6 +58,8 @@ const lookupHtmlTagReactNativeEquivalent = (tagName) => {
             return [Bold, false];
         case('a'):
             return [Link, true];
+        case('img'):
+            return [Emojo, true];
         default:
             return [React.Fragment, false];
     }
