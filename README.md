@@ -4,12 +4,20 @@ A fediverse client made primarily for use with GoToSocial instances.
 Build in React Native for iOS and Android.  
 Very much work in progress.
 
+## Current state of the project
+
+As it stands right now, this app cannot do most things it will have to do before becoming a client anyone would want to actually use.  
+Check out the [MVP project board](https://github.com/users/DysphoricUnicorn/projects/1/views/1) to see what it still lacks.
+
+As it stands currently, even installing the project is a bit annoying since we've got some peer dependency mismatches that make it
+impossible to just run `npm install`, you will need to add `--force`, which should really be fixed...
+
 ## Reasoning
 
 Most clients available for mobile devices are made primarily for use with Mastodon. This leads to annoying bugs when encountering the things
 that GoToSocial does differently than Mastodon.  
-Also, my favourite Mastodon client seems to no longer be in active development, so I can not hope that its developer fixes any bugs in it, no
-matter if they relate to GoToSocial or not.
+Also, my favourite Mastodon client seems to no longer be in active development, so I can not hope that its developer fixes any bugs in it,
+no matter if they relate to GoToSocial or not.
 
 ## Naming
 
