@@ -18,7 +18,6 @@ export const parsePost = (str, emoji = []) => {
     emoji.forEach((emojo) => {
         const regex = new RegExp(':' + emojo.shortcode + ':', 'g')
         decoded = decoded.replace(regex, '<img src="' + emojo.url + '" alt="' + emojo.shortcode + '">');
-        console.log(decoded, emojo, regex)
     });
 
     const parsed = HTML.parse(decoded);
