@@ -149,7 +149,7 @@ const Post = (props) => {
         </PostMetadataView>
         <View>
             {readPost.spoiler_text && <>
-                <PostText>{parsePost(readPost.spoiler_text, post.emojis)}</PostText>
+                <PostText accessibilityLanguage={post.language}>{parsePost(readPost.spoiler_text, post.emojis)}</PostText>
                 <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>
             </>}
             {cnShown && <PostText selectable={post.visibility !== 'private'}>
