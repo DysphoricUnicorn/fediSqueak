@@ -1,19 +1,12 @@
-import AppText from './AppText';
 import React from 'react';
 import styled from 'styled-components/native';
-import {Image, Linking, Text} from 'react-native';
+import {Linking, Text} from 'react-native';
 import Emojo from './Emojo';
-
-export const PostText = styled(AppText)`
-  font-size: 18px;
-`;
+import PostText from './PostText';
 
 const ParagraphOuter = styled.View`
   margin-top: 5px;
   margin-bottom: 5px;
-  color: white;
-  flex-direction: row;
-  flex-wrap: wrap;
 `;
 
 const Paragraph = (props) => {
@@ -34,7 +27,7 @@ const ColoredLink = styled(PostText)`
   color: #ff00ff;
 `;
 
-const Link = (props) => {
+export const Link = (props) => {
     const handleLinkPress = () => {
         Linking.openURL(props.href).catch((reason) => console.error('could not open link', reason));
     };

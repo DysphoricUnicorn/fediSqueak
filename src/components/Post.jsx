@@ -5,6 +5,8 @@ import {parsePost} from '../helpers/generalHelpers';
 import React from 'react';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
 import {callAuthenticated} from '../helpers/apiHelper';
+import Attachment from './Attachment';
+import PostText from './PostText';
 
 const PostView = styled.View`
   flex-direction: column;
@@ -66,9 +68,24 @@ const InteractionPressable = styled.Pressable`
   width: 33%;
 `;
 
-const PostText = styled(AppText)`
+const PostContentView = styled.View`
+  max-height: 500px; /* FIXME: This causes very long posts to be rendered next to the viewable screen for some reason... */
+  max-width: 100%;
+  overflow: hidden;
+  flex-direction: column;
+  flex-wrap: nowrap;
+`;
+
+const RebloggerText = styled(AppText)`
   /* TODO: font size from device config! */
-  font-size: 18px;
+  font-size: 15px;
+`;
+
+const AttachmentContainer = styled.View`
+  width: 100%;
+  padding: 5px;
+  flex-direction: row;
+  flex-wrap: wrap;
 `;
 
 const Post = (props) => {
@@ -134,10 +151,10 @@ const Post = (props) => {
     return <PostView>
         {post.reblog && <PostMetadataView>
             <TinyPostImage source={{uri: post.account.avatar}}/>
-            <PostText>
+            <RebloggerText>
                 <MaterialIcon color="white" name="repeat"/>
-                {parsePost(post.account.acct, post.account.emojis)} boosted:
-            </PostText>
+                {post.account.acct} boosted:
+            </RebloggerText>
         </PostMetadataView>}
         <PostMetadataView>
             <PostImage source={{uri: readPost.account.avatar}}/>
@@ -149,12 +166,19 @@ const Post = (props) => {
         </PostMetadataView>
         <View>
             {readPost.spoiler_text && <>
-                <PostText accessibilityLanguage={post.language}>{parsePost(readPost.spoiler_text, post.emojis)}</PostText>
+                <PostText accessibilityLanguage={readPost.language}>{parsePost(readPost.spoiler_text, readPost.emojis)}</PostText>
                 <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>
             </>}
-            {cnShown && <PostText selectable={post.visibility !== 'private'}>
-                {parsePost(post.content, post.emojis)}
-            </PostText>}
+            {cnShown && <>
+                <PostContentView>
+                    <PostText selectable={post.visibility !== 'private'}>
+                        {parsePost(readPost.content, readPost.emojis)}
+                    </PostText>
+                </PostContentView>
+                {Boolean(readPost.media_attachments) && <AttachmentContainer>
+                    {readPost.media_attachments.map((attachment, index) => <Attachment key={index} attachment={attachment}/>)}
+                </AttachmentContainer>}
+            </>}
         </View>
         <PostInteractionView>
             <InteractionPressable onPress={() => console.log('not implemented')}>
