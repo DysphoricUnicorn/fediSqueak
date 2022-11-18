@@ -8,7 +8,7 @@ import CenteredAppText from '../components/CenteredAppText';
 import CenteredMaterialIcon from '../components/CenteredMaterialIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {callAuthenticated} from '../helpers/apiHelper';
-import {Button, RefreshControl} from 'react-native';
+import {Button, FlatList} from 'react-native';
 import Post from '../components/Post';
 
 const OwnProfileImage = styled.Image`
@@ -119,31 +119,37 @@ const Timeline = (props) => {
         return <AppText>Fetching account...</AppText>;
     }
 
+    const renderPost = ({item, index}) => {
+        const post = item;
+        const renderPost = <Post post={post}
+                                 instanceInfo={instanceInfo}
+                                 oauthToken={oauthToken}
+                                 setPosts={setPosts}/>;
+        if (post.id === previousLast && index !== posts.length - 1) {
+            return <React.Fragment>
+                {renderPost}
+                <Button title="Load more" onPress={() => handleLoadMore(post.id, sortedPosts?.[index + 1]?.id)}
+                        disabled={loadingMore}/>
+            </React.Fragment>;
+        }
+        return renderPost;
+    };
+
     const sortedPosts = posts.sort((a, b) => a.created_at > b.created_at ? -1 : 1);
     return <>
         <TopBar title={currentTl}
                 subTitle={account.acct}
                 Icon={<OwnProfileImage source={{uri: account.avatar}}/>}
                 SubMenu={<TimelineSubMenu currentTl={currentTl} setCurrentTl={setCurrentTl}/>}/>
-        <PostScrollView>
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
-            {sortedPosts.map((post, index) => {
-                const renderPost = <Post post={post}
-                                         key={post.id + post.account.acct}
-                                         instanceInfo={instanceInfo}
-                                         oauthToken={oauthToken}
-                                         setPosts={setPosts}/>;
-                if (post.id === previousLast && index !== posts.length - 1) {
-                    return <React.Fragment key={post.id + post.account.acct}>
-                        {renderPost}
-                        <Button title="load more" onPress={() => handleLoadMore(post.id, sortedPosts?.[index + 1]?.id)}
-                                disabled={loadingMore}/>
-                    </React.Fragment>;
-                }
-                return renderPost;
-            })}
-            <Button title="Load more" onPress={() => handleLoadMore()} disabled={loadingMore}/>
-        </PostScrollView>
+        <FlatList renderItem={renderPost}
+                  data={posts}
+                  keyExtractor={post => post.id}
+                  onRefresh={handleRefresh}
+                  refreshing={refreshing}
+                  onEndReached={() => handleLoadMore()}
+                  onEndReachedThreshold={0.7}
+                  scrollsToTop={false}
+                  ListEmptyComponent={<Button title="Load posts" onPress={() => handleLoadMore()} disabled={loadingMore}/>}/>
     </>;
 };
 
