@@ -6,6 +6,7 @@ import AppText from './AppText';
 import {callAuthenticated} from '../helpers/apiHelper';
 import {MenuProvider} from 'react-native-popup-menu';
 import Settings from '../views/Settings';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BottomBarContainer = styled.View`
   margin-top: auto;
@@ -49,7 +50,24 @@ const BottomBarIcon = (props) => {
 const ContentBase = (props) => {
     const {oauthToken, instanceInfo} = props;
     const [currentView, setCurrentView] = React.useState('home');
+    const [currentTl, setCurrentTl] = React.useState('home');
     const [account, setAccount] = React.useState();
+    const timelineScrollPosition = React.useRef();
+    const [posts, _setPosts] = React.useState([]);
+
+    const setPosts = (newPosts, persist = true) => {
+        // Allow functions to be passed instead of a new value, just like regular react state update functions allow
+        if (typeof newPosts === 'function') {
+            newPosts = newPosts(posts);
+        }
+
+        _setPosts(newPosts);
+        if (persist && newPosts !== undefined) {
+            AsyncStorage.setItem('posts' + currentTl, JSON.stringify(newPosts)).catch((reason) => {
+                console.error('Could not store posts', reason);
+            });
+        }
+    };
 
     React.useEffect(() => {
         callAuthenticated(instanceInfo.uri, '/api/v1/accounts/verify_credentials', 'GET', oauthToken).then((result) => {
@@ -61,8 +79,17 @@ const ContentBase = (props) => {
 
     return <MenuProvider>
         <MainContentView>
-            {currentView === 'home' && <Timeline oauthToken={oauthToken} instanceInfo={instanceInfo} account={account}/>
-            || currentView === 'settings' && <Settings/>}
+            {currentView === 'home' &&
+                <Timeline oauthToken={oauthToken}
+                          instanceInfo={instanceInfo}
+                          account={account}
+                          timelineScrollPosition={timelineScrollPosition.current}
+                          setTimelineScrollPosition={(newPos) => timelineScrollPosition.current = newPos}
+                          posts={posts}
+                          setPosts={setPosts}
+                          currentTl={currentTl}
+                          setCurrentTl={setCurrentTl}/>
+                || currentView === 'settings' && <Settings setPosts={_setPosts}/>}
         </MainContentView>
         <BottomBarContainer>
             <BottomBarIcon borderRadius={0} name="home" onPress={() => setCurrentView('home')}>Home</BottomBarIcon>

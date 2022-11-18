@@ -16,15 +16,19 @@ const OwnProfileImage = styled.Image`
   width: 50px;
 `;
 
-const PostScrollView = styled.ScrollView`
-  margin-bottom: 120px;
-`;
-
 const Timeline = (props) => {
-    const {account, oauthToken, instanceInfo} = props;
+    const {
+        account,
+        oauthToken,
+        instanceInfo,
+        posts,
+        setPosts,
+        timelineScrollPosition,
+        setTimelineScrollPosition,
+        currentTl,
+        setCurrentTl,
+    } = props;
 
-    const [currentTl, setCurrentTl] = React.useState('home');
-    const [posts, setPosts] = React.useState([]);
     const [refreshing, setRefreshing] = React.useState(true);
     const [loadingMore, setLoadingMore] = React.useState(true);
     const [previousLast, setPreviousLast] = React.useState();
@@ -34,53 +38,49 @@ const Timeline = (props) => {
     }, [currentTl]);
 
     React.useEffect(() => {
-        AsyncStorage.getItem('posts' + currentTl).then((oldPosts) => {
-            if (oldPosts) {
-                setPosts(JSON.parse(oldPosts));
-            } else {
-                return Promise.reject();
-            }
-        }).catch(() => {
-            callAuthenticated(instanceInfo.uri, '/api/v1/timelines/home?limit=20', 'GET', oauthToken)
-                .then((newPosts) => {
-                    if (newPosts) {
-                        setPosts(newPosts);
-                        AsyncStorage.setItem('posts' + currentTl, JSON.stringify(newPosts)).catch((reason) => {
-                            console.error('Could not store posts', reason);
-                        });
-                    } else {
-                        return Promise.reject('No posts returned');
-                    }
-                })
-                .catch((reason) => {
-                    console.warn('Could not fetch posts', reason);
-                });
-        }).finally(() => {
+        if (posts.length === 0) {
+            AsyncStorage.getItem('posts' + currentTl).then((oldPosts) => {
+                if (oldPosts) {
+                    setPosts(JSON.parse(oldPosts), false);
+                } else {
+                    return Promise.reject();
+                }
+            }).catch(() => {
+                callAuthenticated(instanceInfo.uri, '/api/v1/timelines/home?limit=20', 'GET', oauthToken)
+                    .then((newPosts) => {
+                        if (newPosts) {
+                            setPosts(newPosts);
+                        } else {
+                            return Promise.reject('No posts returned');
+                        }
+                    })
+                    .catch((reason) => {
+                        console.warn('Could not fetch posts', reason);
+                    });
+            }).finally(() => {
+                setRefreshing(false);
+                setLoadingMore(false);
+            });
+        } else {
             setRefreshing(false);
-            setLoadingMore(false);
-        });
+        }
     }, []);
 
     const fetchAndSetPosts = (route) => {
         callAuthenticated(instanceInfo.uri, route, 'GET', oauthToken)
             .then((fetchedPosts) => {
-                setPosts((oldPosts) => {
-                    const newPosts = [...fetchedPosts, ...oldPosts].sort((a, b) => a.id > b.id ? -1 : 1);
-                    const newPreviousLastId = fetchedPosts[fetchedPosts.length - 1]?.id;
-                    setPreviousLast(newPreviousLastId);
-                    if (newPreviousLastId) {
-                        AsyncStorage.setItem('previousLast' + currentTl, fetchedPosts[fetchedPosts.length - 1]?.id).catch((reason => {
-                            console.error('Could not set previousLast', reason);
-                        }));
-                    } else {
-                        AsyncStorage.removeItem('previousLast' + currentTl)
-                            .catch((reason => console.error('could not remote previousLast')));
-                    }
-                    AsyncStorage.setItem('posts' + currentTl, JSON.stringify(newPosts)).catch((reason) => {
-                        console.error('Could not store posts', reason);
-                    });
-                    return newPosts;
-                });
+                const newPosts = [...fetchedPosts, ...posts].sort((a, b) => a.id > b.id ? -1 : 1);
+                const newPreviousLastId = fetchedPosts[fetchedPosts.length - 1]?.id;
+                setPreviousLast(newPreviousLastId);
+                if (newPreviousLastId) {
+                    AsyncStorage.setItem('previousLast' + currentTl, fetchedPosts[fetchedPosts.length - 1]?.id).catch((reason => {
+                        console.error('Could not set previousLast', reason);
+                    }));
+                } else {
+                    AsyncStorage.removeItem('previousLast' + currentTl)
+                        .catch((reason => console.error('could not remote previousLast', reason)));
+                }
+                setPosts(newPosts);
             })
             .catch((reason) => {
                 console.error('Post fetching failed', reason);
