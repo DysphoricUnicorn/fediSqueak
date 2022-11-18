@@ -9,13 +9,12 @@ import Settings from '../views/Settings';
 
 const BottomBarContainer = styled.View`
   margin-top: auto;
-  margin-bottom: 5px;
   align-self: end;
   width: 100%;
-  padding: 5px;
+  padding: 5px 5px 10px;
   flex-direction: row;
   flex-wrap: nowrap;
-  background-color: #ff00ff99;
+  background-color: #ff00fff0;
   backdrop-filter: blur(20px) saturate(120%) contrast(200%);
 `;
 
@@ -35,9 +34,8 @@ const BottomBarIconText = styled(AppText)`
   font-size: 20px;
 `;
 
-const MainContentView = styled.View`
+const MainContentView = styled.SafeAreaView`
   margin-top: 0;
-  padding-top: 50px;
 `;
 
 const BottomBarIcon = (props) => {

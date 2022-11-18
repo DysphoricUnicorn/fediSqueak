@@ -7,7 +7,7 @@ const TopBarContainer = styled.View`
   flex-direction: row;
   flex-wrap: nowrap;
   width: 100%;
-  background-color: #ff00ff80;
+  background-color: #ff00fff0;
 `;
 
 const TitleText = styled(CenteredAppText)`
