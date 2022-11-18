@@ -100,20 +100,25 @@ const Post = (props) => {
     const updatePost = (updatedPost) => {
         setPosts((oldPosts) => {
             const id = oldPosts.findIndex(oldPost => oldPost.id === post.id);
-            if (id !== -1) {
-                const newPosts = [...oldPosts];
-                newPosts[id] = updatedPost;
-                return newPosts;
+            if (id === -1) {
+                console.warn('Interacted with post that does not seem to exist');
+                return oldPosts;
             }
-            console.warn('Interacted with post that does not seem to exist');
-            return oldPosts;
+
+            const newPosts = [...oldPosts];
+            if (post.reblog) {
+                newPosts[id].reblog = updatedPost;
+            } else {
+                newPosts[id] = updatedPost;
+            }
+            return newPosts;
         });
     };
 
     const handleFavouriteClick = () => {
         if (favourited === false) {
             setFavourited(true);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + post.id + '/favourite', 'POST', oauthToken)
+            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/favourite', 'POST', oauthToken)
                 .then(updatePost)
                 .catch((reason) => {
                     setFavourited(false);
@@ -121,26 +126,27 @@ const Post = (props) => {
                 });
         } else {
             setFavourited(false);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + post.id + '/unfavourite', 'POST', oauthToken)
+            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unfavourite', 'POST', oauthToken)
                 .then(updatePost)
                 .catch((reason) => {
-                    setFavourited(true);
-                    console.error('Could not unfavourite post', reason);
-                });
+                        setFavourited(true);
+                        console.error('Could not unfavourite post', reason);
+                    },
+                );
         }
     };
 
     const handleReblogClick = () => {
         if (reblogged === false) {
             setReblogged(true);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + post.id + '/reblog', 'POST', oauthToken)
+            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/reblog', 'POST', oauthToken)
                 .catch((reason) => {
                     setReblogged(false);
                     console.error('Could not reblog post', reason);
                 });
         } else {
             setReblogged(false);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + post.id + '/unreblog', 'POST', oauthToken)
+            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unreblog', 'POST', oauthToken)
                 .catch((reason) => {
                     setReblogged(true);
                     console.error('Could not unreblog post', reason);
@@ -194,15 +200,15 @@ const Post = (props) => {
                 </InteractionText>
             </InteractionPressable>
             {readPost.visibility !== 'private' &&
-            <InteractionPressable onPress={handleReblogClick}>
-                <InteractionText active={reblogged}>
-                    <MaterialIcon size={15} name="repeat" color={reblogged ? '#ff00ff' : 'white'}/>
-                    Boost
-                </InteractionText>
-            </InteractionPressable>
+                <InteractionPressable onPress={handleReblogClick}>
+                    <InteractionText active={reblogged}>
+                        <MaterialIcon size={15} name="repeat" color={reblogged ? '#ff00ff' : 'white'}/>
+                        Boost
+                    </InteractionText>
+                </InteractionPressable>
             }
         </PostInteractionView>
     </PostView>;
 };
 
-export default Post;
+export default React.memo(Post);
