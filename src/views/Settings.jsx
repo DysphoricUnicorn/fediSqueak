@@ -14,7 +14,6 @@ const Settings = (props) => {
             .then(() => setPosts([]))
             .catch((reason) => console.error('Cache clearing failed', reason))
             .finally(() => setClearing(false));
-
     };
 
     return <>

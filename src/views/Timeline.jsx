@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {callAuthenticated} from '../helpers/apiHelper';
 import {Button, FlatList} from 'react-native';
 import Post from '../components/Post';
+import {getPostHeight, getPostOffset} from '../helpers/postHelpers';
 
 const OwnProfileImage = styled.Image`
   height: 50px;
@@ -32,6 +33,8 @@ const Timeline = (props) => {
     const [refreshing, setRefreshing] = React.useState(true);
     const [loadingMore, setLoadingMore] = React.useState(true);
     const [previousLast, setPreviousLast] = React.useState();
+
+    const tlScroll = React.useRef();
 
     React.useEffect(() => {
         AsyncStorage.getItem('previousLast' + currentTl).then((item) => setPreviousLast(item));
@@ -63,6 +66,9 @@ const Timeline = (props) => {
             });
         } else {
             setRefreshing(false);
+            // We need to push the scrollToOffset call to the bottom of the execution stack to avoid a race condition when the TL is there but not rendered yet
+            window.setTimeout(() => tlScroll.current?.scrollToOffset({offset: timelineScrollPosition, animated: false}), 0)
+            ;
         }
     }, []);
 
@@ -135,6 +141,15 @@ const Timeline = (props) => {
         return renderPost;
     };
 
+    const getItemLayout = (data, index) => {
+        return {length: getPostHeight(data, index), offset: getPostOffset(data, index), index};
+    };
+
+    const handleScrollEndDrag = (e) => {
+        // We only fire the event on end of drag events. This could be suboptimal if the user scrolls a bunch and then closes out of the view, but I think the possible performance increase is worth it for now
+        setTimelineScrollPosition(e.nativeEvent.contentOffset.y);
+    };
+
     const sortedPosts = posts.sort((a, b) => a.created_at > b.created_at ? -1 : 1);
     return <>
         <TopBar title={currentTl}
@@ -142,6 +157,8 @@ const Timeline = (props) => {
                 Icon={<OwnProfileImage source={{uri: account.avatar}}/>}
                 SubMenu={<TimelineSubMenu currentTl={currentTl} setCurrentTl={setCurrentTl}/>}/>
         <FlatList renderItem={renderPost}
+                  ref={ref => tlScroll.current = ref}
+                  onScrollEndDrag={handleScrollEndDrag}
                   data={posts}
                   keyExtractor={post => post.id}
                   onRefresh={handleRefresh}
@@ -149,6 +166,7 @@ const Timeline = (props) => {
                   onEndReached={() => handleLoadMore()}
                   onEndReachedThreshold={0.7}
                   scrollsToTop={false}
+                  getItemLayout={getItemLayout}
                   ListEmptyComponent={<Button title="Load posts" onPress={() => handleLoadMore()} disabled={loadingMore}/>}/>
     </>;
 };

@@ -69,8 +69,8 @@ const InteractionPressable = styled.Pressable`
 `;
 
 const PostContentView = styled.View`
-  max-height: 500px; /* FIXME: This causes very long posts to be rendered next to the viewable screen for some reason... */
-  max-width: 100%;
+  //max-height: 500px; /* FIXME: This causes very long posts to be rendered next to the viewable screen for some reason... */
+  width: 100%;
   overflow: hidden;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -91,13 +91,13 @@ const AttachmentContainer = styled.View`
 const Post = (props) => {
     const {post, setPosts, oauthToken, instanceInfo} = props;
     const readPost = post.reblog ? post.reblog : post;
-    const [cnShown, setCnShown] = React.useState(!readPost.spoiler_text);
+    const [cnShown, setCnShown] = React.useState(post.cnShown ?? !readPost.spoiler_text);
     const [favourited, setFavourited] = React.useState(readPost.favourited);
     const [reblogged, setReblogged] = React.useState(readPost.reblogged);
 
     const postCreationTime = new Date(readPost.created_at);
 
-    const updatePost = (updatedPost) => {
+    const updatePost = (updatedPost, direct = false) => {
         setPosts((oldPosts) => {
             const id = oldPosts.findIndex(oldPost => oldPost.id === post.id);
             if (id === -1) {
@@ -106,13 +106,20 @@ const Post = (props) => {
             }
 
             const newPosts = [...oldPosts];
-            if (post.reblog) {
+            if (!direct && post.reblog) {
                 newPosts[id].reblog = updatedPost;
             } else {
                 newPosts[id] = updatedPost;
             }
             return newPosts;
         });
+    };
+
+    const handleLayoutChange = (e) => {
+        const {height} = e.nativeEvent.layout;
+        if (post.renderedHeight !== height) {
+            updatePost({...post, renderedHeight: height, cnShown: cnShown}, true);
+        }
     };
 
     const handleFavouriteClick = () => {
@@ -154,7 +161,7 @@ const Post = (props) => {
         }
     };
 
-    return <PostView>
+    return <PostView onLayout={handleLayoutChange}>
         {post.reblog && <PostMetadataView>
             <TinyPostImage source={{uri: post.account.avatar}}/>
             <RebloggerText>
@@ -170,7 +177,7 @@ const Post = (props) => {
                 <PostTimeStamp>{postCreationTime.toLocaleString()} {readPost.visibility}</PostTimeStamp>
             </PostNameContainer>
         </PostMetadataView>
-        <View>
+        <View style={{maxWidth: '100%', flexWrap: 'nowrap', flexDirection: 'column'}}>
             {readPost.spoiler_text && <>
                 <PostText accessibilityLanguage={readPost.language}>{parsePost(readPost.spoiler_text, readPost.emojis)}</PostText>
                 <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>
@@ -180,10 +187,10 @@ const Post = (props) => {
                     <PostText selectable={post.visibility !== 'private'}>
                         {parsePost(readPost.content, readPost.emojis)}
                     </PostText>
+                    {Boolean(readPost.media_attachments) && <AttachmentContainer>
+                        {readPost.media_attachments.map((attachment, index) => <Attachment key={index} attachment={attachment}/>)}
+                    </AttachmentContainer>}
                 </PostContentView>
-                {Boolean(readPost.media_attachments) && <AttachmentContainer>
-                    {readPost.media_attachments.map((attachment, index) => <Attachment key={index} attachment={attachment}/>)}
-                </AttachmentContainer>}
             </>}
         </View>
         <PostInteractionView>
