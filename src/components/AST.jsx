@@ -3,10 +3,14 @@ import styled from 'styled-components/native';
 import {Linking, Text} from 'react-native';
 import Emojo from './Emojo';
 import PostText from './PostText';
+import {decodeHtmlEntities} from '../helpers/postHelpers';
 
 const ParagraphOuter = styled.View`
   margin-top: 5px;
   margin-bottom: 5px;
+  flex-shrink: 1;
+  flex-direction: column;
+  flex-wrap: nowrap;
 `;
 
 const Paragraph = (props) => {
@@ -62,13 +66,13 @@ const AST = (props) => {
     const {parsed} = props;
     if (parsed.type === 'text') {
         const Tag = props.childOfA ? ColoredLink : PostText;
-        return <Tag>{parsed.content}</Tag>;
+        return <Tag>{decodeHtmlEntities(parsed.content)}</Tag>;
     }
 
     const [Tag, allowsAttributes] = lookupHtmlTagReactNativeEquivalent(parsed.name);
 
     if (!parsed.children) {
-        return '\n';
+        return <React.Fragment>{'\n'}</React.Fragment>;
     }
 
     const tagProps = allowsAttributes ? parsed.attrs : {};
