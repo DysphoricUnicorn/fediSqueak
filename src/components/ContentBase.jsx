@@ -83,7 +83,7 @@ const ContentBase = (props) => {
                 <Timeline oauthToken={oauthToken}
                           instanceInfo={instanceInfo}
                           account={account}
-                          timelineScrollPosition={timelineScrollPosition.current}
+                          timelineScrollPosition={timelineScrollPosition}
                           setTimelineScrollPosition={(newPos) => timelineScrollPosition.current = newPos}
                           posts={posts}
                           setPosts={setPosts}

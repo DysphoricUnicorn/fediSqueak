@@ -67,7 +67,7 @@ const Timeline = (props) => {
         } else {
             setRefreshing(false);
             // We need to push the scrollToOffset call to the bottom of the execution stack to avoid a race condition when the TL is there but not rendered yet
-            window.setTimeout(() => tlScroll.current?.scrollToOffset({offset: timelineScrollPosition, animated: false}), 0)
+            window.setTimeout(() => tlScroll.current?.scrollToOffset({offset: timelineScrollPosition.current, animated: false}), 0)
             ;
         }
     }, []);
@@ -145,8 +145,7 @@ const Timeline = (props) => {
         return {length: getPostHeight(data, index), offset: getPostOffset(data, index), index};
     };
 
-    const handleScrollEndDrag = (e) => {
-        // We only fire the event on end of drag events. This could be suboptimal if the user scrolls a bunch and then closes out of the view, but I think the possible performance increase is worth it for now
+    const handleScroll = (e) => {
         setTimelineScrollPosition(e.nativeEvent.contentOffset.y);
     };
 
@@ -158,7 +157,8 @@ const Timeline = (props) => {
                 SubMenu={<TimelineSubMenu currentTl={currentTl} setCurrentTl={setCurrentTl}/>}/>
         <FlatList renderItem={renderPost}
                   ref={ref => tlScroll.current = ref}
-                  onScrollEndDrag={handleScrollEndDrag}
+                  onScroll={handleScroll}
+                  scrollEventThrottle={16}
                   data={posts}
                   keyExtractor={post => post.id}
                   onRefresh={handleRefresh}
