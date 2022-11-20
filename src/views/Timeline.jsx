@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {callAuthenticated} from '../helpers/apiHelper';
 import {Button, FlatList} from 'react-native';
 import Post from '../components/Post';
-import {getPostHeight, getPostOffset} from '../helpers/postHelpers';
+import {findPostByOffset, getPostHeight, getPostOffset} from '../helpers/postHelpers';
 
 const OwnProfileImage = styled.Image`
   height: 50px;
@@ -67,13 +67,32 @@ const Timeline = (props) => {
         } else {
             setRefreshing(false);
             // We need to push the scrollToOffset call to the bottom of the execution stack to avoid a race condition when the TL is there but not rendered yet
-            window.setTimeout(() => tlScroll.current?.scrollToOffset({offset: timelineScrollPosition.current, animated: false}), 0)
-            ;
+            window.setTimeout(() => {
+                tlScroll.current?.scrollToOffset({offset: timelineScrollPosition.current, animated: false});
+            }, 0);
         }
+
+        return throwOutOldPosts;
     }, []);
 
+    /**
+     * Deletes posts the user has scrolled past
+     * TODO: only move them to cold cache instead of fully deleting
+     */
+    const throwOutOldPosts = () => {
+        const [index, difference] = findPostByOffset(posts, timelineScrollPosition.current - 1000);
+        if (index > 1) {
+            setPosts((oldPosts) => {
+                return oldPosts.slice(index - 1);
+            });
+            setTimelineScrollPosition(difference + 1000);
+            return difference + 1000;
+        }
+        return timelineScrollPosition.current;
+    };
+
     const fetchAndSetPosts = (route) => {
-        callAuthenticated(instanceInfo.uri, route, 'GET', oauthToken)
+        return callAuthenticated(instanceInfo.uri, route, 'GET', oauthToken)
             .then((fetchedPosts) => {
                 const newPosts = [...fetchedPosts, ...posts].sort((a, b) => a.id > b.id ? -1 : 1);
                 const newPreviousLastId = fetchedPosts[fetchedPosts.length - 1]?.id;
@@ -118,6 +137,7 @@ const Timeline = (props) => {
         } else if (posts.length > 0) {
             route += '&max_id=' + posts[posts.length - 1].id;
         }
+
         fetchAndSetPosts(route);
     };
 
@@ -134,7 +154,8 @@ const Timeline = (props) => {
         if (post.id === previousLast && index !== posts.length - 1) {
             return <React.Fragment>
                 {renderPost}
-                <Button title="Load more" onPress={() => handleLoadMore(post.id, sortedPosts?.[index + 1]?.id)}
+                <Button title="Load more"
+                        onPress={() => handleLoadMore(post.id, sortedPosts?.[index + 1]?.id)}
                         disabled={loadingMore}/>
             </React.Fragment>;
         }
@@ -166,6 +187,8 @@ const Timeline = (props) => {
                   onEndReached={() => handleLoadMore()}
                   onEndReachedThreshold={0.7}
                   scrollsToTop={false}
+                  removeClippedSubviews={true}
+                  windowSize={31}
                   getItemLayout={getItemLayout}
                   ListEmptyComponent={<Button title="Load posts" onPress={() => handleLoadMore()} disabled={loadingMore}/>}/>
     </>;

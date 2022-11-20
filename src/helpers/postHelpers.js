@@ -25,6 +25,24 @@ export const getPostOffset = (posts, index) => {
     return offset;
 };
 
+/**
+ * Returns the index of the last post before the specified offset as well as the difference between that post's offset and the specified one
+ * @param {Array<Object>} posts
+ * @param {number} offset
+ * @returns {(number|number)[]}
+ */
+export const findPostByOffset = (posts, offset) => {
+    let calculatedOffset = 0;
+    let lastOffset = 0;
+    let index = 0;
+    while (calculatedOffset < offset && posts[index]) {
+        lastOffset = calculatedOffset;
+        calculatedOffset += getPostHeight(posts, index);
+        index++;
+    }
+    return [index, offset - lastOffset];
+};
+
 export const decodeHtmlEntities = (str) => {
     return (str
             ?.replace(/&#(\d+);/g, (match, dec) => {
