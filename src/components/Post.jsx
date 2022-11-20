@@ -4,9 +4,9 @@ import {Button, View} from 'react-native';
 import {parsePost} from '../helpers/generalHelpers';
 import React from 'react';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
-import {callAuthenticated} from '../helpers/apiHelper';
 import Attachment from './Attachment';
 import PostText from './PostText';
+import {handleFavouriteClick, handleReblogClick, updatePost} from '../helpers/postHelpers';
 
 const PostView = styled.View`
   flex-direction: column;
@@ -97,67 +97,10 @@ const Post = (props) => {
 
     const postCreationTime = new Date(readPost.created_at);
 
-    const updatePost = (updatedPost, direct = false) => {
-        setPosts((oldPosts) => {
-            const id = oldPosts.findIndex(oldPost => oldPost.id === post.id);
-            if (id === -1) {
-                console.warn('Interacted with post that does not seem to exist');
-                return oldPosts;
-            }
-
-            const newPosts = [...oldPosts];
-            if (!direct && post.reblog) {
-                newPosts[id].reblog = updatedPost;
-            } else {
-                newPosts[id] = updatedPost;
-            }
-            return newPosts;
-        });
-    };
-
     const handleLayoutChange = (e) => {
         const {height} = e.nativeEvent.layout;
         if (post.renderedHeight !== height) {
-            updatePost({...post, renderedHeight: height, cnShown: cnShown}, true);
-        }
-    };
-
-    const handleFavouriteClick = () => {
-        if (favourited === false) {
-            setFavourited(true);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/favourite', 'POST', oauthToken)
-                .then(updatePost)
-                .catch((reason) => {
-                    setFavourited(false);
-                    console.error('Could not favourite post', reason);
-                });
-        } else {
-            setFavourited(false);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unfavourite', 'POST', oauthToken)
-                .then(updatePost)
-                .catch((reason) => {
-                        setFavourited(true);
-                        console.error('Could not unfavourite post', reason);
-                    },
-                );
-        }
-    };
-
-    const handleReblogClick = () => {
-        if (reblogged === false) {
-            setReblogged(true);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/reblog', 'POST', oauthToken)
-                .catch((reason) => {
-                    setReblogged(false);
-                    console.error('Could not reblog post', reason);
-                });
-        } else {
-            setReblogged(false);
-            callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unreblog', 'POST', oauthToken)
-                .catch((reason) => {
-                    setReblogged(true);
-                    console.error('Could not unreblog post', reason);
-                });
+            updatePost({...post, renderedHeight: height, cnShown: cnShown}, true, setPosts, post);
         }
     };
 
@@ -200,14 +143,16 @@ const Post = (props) => {
                     Reply
                 </InteractionText>
             </InteractionPressable>
-            <InteractionPressable onPress={handleFavouriteClick}>
+            <InteractionPressable
+                onPress={() => handleFavouriteClick(setPosts, oauthToken, instanceInfo, readPost, post, favourited, setFavourited)}>
                 <InteractionText active={favourited}>
                     {favourited ? <MaterialIcon size={15} name="star" color="#ff00ff"/> :
                         <MaterialIcon size={15} name="star-outline" color="white"/>} Favourite
                 </InteractionText>
             </InteractionPressable>
             {readPost.visibility !== 'private' &&
-                <InteractionPressable onPress={handleReblogClick}>
+                <InteractionPressable
+                    onPress={() => handleReblogClick(setPosts, oauthToken, instanceInfo, readPost, post, reblogged, setReblogged)}>
                     <InteractionText active={reblogged}>
                         <MaterialIcon size={15} name="repeat" color={reblogged ? '#ff00ff' : 'white'}/>
                         Boost

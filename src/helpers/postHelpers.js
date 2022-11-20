@@ -1,9 +1,22 @@
+import {callAuthenticated} from './apiHelper';
+
+/**
+ * Return the cached height of the post, or 500 if it is not yet set
+ * TODO: replace 500 with the actual max height of a post
+ * @param {Array<Object>} posts
+ * @param {number} index
+ * @returns {number}
+ */
 export const getPostHeight = (posts, index) => {
-    // Return the cached height of the post, or 500 if it is not yet set
-    // TODO: replace 500 with the actual max height of a post
     return posts?.[index]?.renderedHeight ?? 500;
 };
 
+/**
+ * Get a post's offset from the top of the timeline
+ * @param {Array<Object>} posts
+ * @param {number} index
+ * @returns {number}
+ */
 export const getPostOffset = (posts, index) => {
     let offset = 0;
     for (let c = 0; c < index; c++) {
@@ -23,4 +36,63 @@ export const decodeHtmlEntities = (str) => {
             .replace(/&gt;/g, '>')
             .replace(/&lt;/g, '<')
         ?? '';
+};
+
+export const updatePost = (updatedPost, direct = false, setPosts, mainPost) => {
+    setPosts((oldPosts) => {
+        const id = oldPosts.findIndex(oldPost => oldPost.id === mainPost.id);
+        if (id === -1) {
+            console.warn('Interacted with post that does not seem to exist');
+            return oldPosts;
+        }
+
+        const newPosts = [...oldPosts];
+        if (!direct && mainPost.reblog) {
+            newPosts[id].reblog = updatedPost;
+        } else {
+            newPosts[id] = updatedPost;
+        }
+        return newPosts;
+    });
+};
+
+export const handleFavouriteClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, favourited, setFavourited) => {
+    if (favourited === false) {
+        setFavourited(true);
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/favourite', 'POST', oauthToken)
+            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost))
+            .catch((reason) => {
+                setFavourited(false);
+                console.error('Could not favourite post', reason);
+            });
+    } else {
+        setFavourited(false);
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unfavourite', 'POST', oauthToken)
+            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost))
+            .catch((reason) => {
+                    setFavourited(true);
+                    console.error('Could not unfavourite post', reason);
+                },
+            );
+    }
+};
+
+export const handleReblogClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, reblogged, setReblogged) => {
+    if (reblogged === false) {
+        setReblogged(true);
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/reblog', 'POST', oauthToken)
+            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost))
+            .catch((reason) => {
+                setReblogged(false);
+                console.error('Could not reblog post', reason);
+            });
+    } else {
+        setReblogged(false);
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unreblog', 'POST', oauthToken)
+            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost))
+            .catch((reason) => {
+                setReblogged(true);
+                console.error('Could not unreblog post', reason);
+            });
+    }
 };
