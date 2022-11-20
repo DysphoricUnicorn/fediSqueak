@@ -1,3 +1,5 @@
+![A crudely drawn gopher with a megaphone superimposed above a nonbinary pride flag](assets/icon.png)
+
 # FediSqueak
 
 A fediverse client made primarily for use with GoToSocial instances.  
