@@ -2,6 +2,7 @@ import React from 'react';
 import {Image, View} from 'react-native';
 import AppText from './AppText';
 import PropTypes from 'prop-types';
+// TODO: replace image with FastImage once I've got a MacOS build system up and running
 
 const HTMLStyleImage = (props) => {
     const [error, setError] = React.useState(false);
