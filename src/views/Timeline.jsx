@@ -1,11 +1,11 @@
 import React from 'react';
-import AppText from '../components/AppText';
+import AppText from '../components/styled/AppText';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import TopBar from '../components/TopBar';
 import {Menu, MenuOption, MenuOptions, MenuTrigger, renderers} from 'react-native-popup-menu';
-import CenteredAppText from '../components/CenteredAppText';
-import CenteredMaterialIcon from '../components/CenteredMaterialIcon';
+import CenteredAppText from '../components/styled/CenteredAppText';
+import CenteredMaterialIcon from '../components/styled/CenteredMaterialIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {callAuthenticated} from '../helpers/apiHelper';
 import {Button, FlatList} from 'react-native';

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image, View} from 'react-native';
-import AppText from './AppText';
+import AppText from './styled/AppText';
 import PropTypes from 'prop-types';
 // TODO: replace image with FastImage once I've got a MacOS build system up and running
 

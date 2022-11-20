@@ -2,11 +2,12 @@ import React from 'react';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
 import Timeline from '../views/Timeline';
 import styled from 'styled-components/native';
-import AppText from './AppText';
+import AppText from './styled/AppText';
 import {callAuthenticated} from '../helpers/apiHelper';
 import {MenuProvider} from 'react-native-popup-menu';
 import Settings from '../views/Settings';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Notifications from '../views/Notifications';
 
 const BottomBarContainer = styled.View`
   margin-top: auto;
@@ -49,6 +50,7 @@ const BottomBarIcon = (props) => {
 
 const ContentBase = (props) => {
     const {oauthToken, instanceInfo} = props;
+    const [notifications, setNotifications] = React.useState([]);
     const [currentView, setCurrentView] = React.useState('home');
     const [currentTl, setCurrentTl] = React.useState('home');
     const [account, setAccount] = React.useState();
@@ -89,6 +91,12 @@ const ContentBase = (props) => {
                           setPosts={setPosts}
                           currentTl={currentTl}
                           setCurrentTl={setCurrentTl}/>
+                || currentView === 'notifications' && <Notifications instanceInfo={instanceInfo}
+                                                                     notifications={notifications}
+                                                                     setNotifications={setNotifications}
+                                                                     oauthToken={oauthToken}
+                                                                     account={account}
+                                                                     setPosts={setPosts}/>
                 || currentView === 'settings' && <Settings setPosts={_setPosts}/>}
         </MainContentView>
         <BottomBarContainer>

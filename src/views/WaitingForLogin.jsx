@@ -1,4 +1,4 @@
-import AppText from '../components/AppText';
+import AppText from '../components/styled/AppText';
 import * as AuthSession from 'expo-auth-session';
 import React from 'react';
 import PropTypes from 'prop-types';

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {Linking, Text} from 'react-native';
 import Emojo from './Emojo';
-import PostText from './PostText';
+import PostText from './styled/PostText';
 import {decodeHtmlEntities} from '../helpers/postHelpers';
 
 const ParagraphOuter = styled.View`

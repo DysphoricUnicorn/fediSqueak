@@ -1,56 +1,21 @@
 import styled from 'styled-components/native';
-import AppText from './AppText';
+import AppText from './styled/AppText';
 import {Button, View} from 'react-native';
 import {parsePost} from '../helpers/generalHelpers';
 import React from 'react';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
 import Attachment from './Attachment';
-import PostText from './PostText';
+import PostText from './styled/PostText';
 import {handleFavouriteClick, handleReblogClick, updatePost} from '../helpers/postHelpers';
-
-const PostView = styled.View`
-  flex-direction: column;
-  width: 100%;
-  padding: 5px;
-  margin-bottom: 15px;
-`;
-
-const PostMetadataView = styled.View`
-  flex-direction: row;
-  width: 100%;
-`;
-
-const PostImage = styled.Image`
-  height: 50px;
-  width: 50px;
-  margin-right: 5px;
-`;
-
-const TinyPostImage = styled.Image`
-  height: 15px;
-  width: 15px;
-  margin-right: 2px;
-`;
-
-const PostDisplayName = styled(AppText)`
-  /* TODO: font size from device config! */
-  font-size: 18px;
-`;
-
-const PostUserName = styled(AppText)`
-  /* TODO: font size from device config! */
-  font-size: 14px;
-`;
-
-const PostTimeStamp = styled(AppText)`
-  /* TODO: font size from device config! */
-  font-size: 12px;
-`;
-
-const PostNameContainer = styled.View`
-  flex-direction: column;
-  justify-content: space-around;
-`;
+import MetadataContainer from './styled/MetadataContainer';
+import PostView from './styled/PostView';
+import TinyImage from './styled/TinyImage';
+import SmallImage from './styled/SmallImage';
+import NameContainer from './styled/NameContainer';
+import DisplayNameText from './styled/DisplayNameText';
+import UserNameText from './styled/UserNameText';
+import PostTimeStamp from './styled/PostTimeStamp';
+import RebloggerText from './styled/RebloggerText';
 
 const PostInteractionView = styled.View`
   flex-direction: row;
@@ -76,11 +41,6 @@ const PostContentView = styled.View`
   flex-wrap: nowrap;
 `;
 
-const RebloggerText = styled(AppText)`
-  /* TODO: font size from device config! */
-  font-size: 15px;
-`;
-
 const AttachmentContainer = styled.View`
   width: 100%;
   padding: 5px;
@@ -89,7 +49,7 @@ const AttachmentContainer = styled.View`
 `;
 
 const Post = (props) => {
-    const {post, setPosts, oauthToken, instanceInfo} = props;
+    const {post, setPosts, oauthToken, instanceInfo, hideNonExistWaning} = props;
     const readPost = post.reblog ? post.reblog : post;
     const [cnShown, setCnShown] = React.useState(post.cnShown ?? !readPost.spoiler_text);
     const [favourited, setFavourited] = React.useState(readPost.favourited);
@@ -100,27 +60,27 @@ const Post = (props) => {
     const handleLayoutChange = (e) => {
         const {height} = e.nativeEvent.layout;
         if (post.renderedHeight !== height) {
-            updatePost({...post, renderedHeight: height, cnShown: cnShown}, true, setPosts, post);
+            updatePost({...post, renderedHeight: height, cnShown: cnShown}, true, setPosts, post, hideNonExistWaning);
         }
     };
 
     return <PostView onLayout={handleLayoutChange}>
-        {post.reblog && <PostMetadataView>
-            <TinyPostImage source={{uri: post.account.avatar}}/>
+        {post.reblog && <MetadataContainer>
+            <TinyImage src={post.account.avatar}/>
             <RebloggerText>
                 <MaterialIcon color="white" name="repeat"/>
                 {post.account.acct} boosted:
             </RebloggerText>
-        </PostMetadataView>}
-        <PostMetadataView>
-            <PostImage source={{uri: readPost.account.avatar}}/>
-            <PostNameContainer>
-                <PostDisplayName>{parsePost(readPost.account.display_name, readPost.account.emojis)}</PostDisplayName>
-                <PostUserName>{readPost.account.acct}</PostUserName>
+        </MetadataContainer>}
+        <MetadataContainer>
+            <SmallImage src={readPost.account.avatar}/>
+            <NameContainer>
+                <DisplayNameText>{parsePost(readPost.account.display_name, readPost.account.emojis)}</DisplayNameText>
+                <UserNameText>{readPost.account.acct}</UserNameText>
                 <PostTimeStamp>{postCreationTime.toLocaleString()} {readPost.visibility}</PostTimeStamp>
-            </PostNameContainer>
-        </PostMetadataView>
-        <View style={{maxWidth: '100%', flexWrap: 'nowrap', flexDirection: 'column'}}>
+            </NameContainer>
+        </MetadataContainer>
+        <View>
             {readPost.spoiler_text && <>
                 <PostText accessibilityLanguage={readPost.language}>{parsePost(readPost.spoiler_text, readPost.emojis)}</PostText>
                 <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>
@@ -144,7 +104,7 @@ const Post = (props) => {
                 </InteractionText>
             </InteractionPressable>
             <InteractionPressable
-                onPress={() => handleFavouriteClick(setPosts, oauthToken, instanceInfo, readPost, post, favourited, setFavourited)}>
+                onPress={() => handleFavouriteClick(setPosts, oauthToken, instanceInfo, readPost, post, favourited, setFavourited, hideNonExistWaning)}>
                 <InteractionText active={favourited}>
                     {favourited ? <MaterialIcon size={15} name="star" color="#ff00ff"/> :
                         <MaterialIcon size={15} name="star-outline" color="white"/>} Favourite
@@ -152,7 +112,7 @@ const Post = (props) => {
             </InteractionPressable>
             {readPost.visibility !== 'private' &&
                 <InteractionPressable
-                    onPress={() => handleReblogClick(setPosts, oauthToken, instanceInfo, readPost, post, reblogged, setReblogged)}>
+                    onPress={() => handleReblogClick(setPosts, oauthToken, instanceInfo, readPost, post, reblogged, setReblogged, hideNonExistWaning)}>
                     <InteractionText active={reblogged}>
                         <MaterialIcon size={15} name="repeat" color={reblogged ? '#ff00ff' : 'white'}/>
                         Boost

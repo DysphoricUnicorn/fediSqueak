@@ -56,11 +56,13 @@ export const decodeHtmlEntities = (str) => {
         ?? '';
 };
 
-export const updatePost = (updatedPost, direct = false, setPosts, mainPost) => {
+export const updatePost = (updatedPost, direct = false, setPosts, mainPost, hideNonExistWarning = false) => {
     setPosts((oldPosts) => {
         const id = oldPosts.findIndex(oldPost => oldPost.id === mainPost.id);
         if (id === -1) {
-            console.warn('Interacted with post that does not seem to exist');
+            if (!hideNonExistWarning) {
+                console.warn('Interacted with post that does not seem to exist');
+            }
             return oldPosts;
         }
 
@@ -74,19 +76,19 @@ export const updatePost = (updatedPost, direct = false, setPosts, mainPost) => {
     });
 };
 
-export const handleFavouriteClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, favourited, setFavourited) => {
+export const handleFavouriteClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, favourited, setFavourited, hideNonExistWarning = false) => {
     if (favourited === false) {
         setFavourited(true);
-        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/favourite', 'POST', oauthToken)
-            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost))
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/favourite', 'POST', oauthToken, hideNonExistWarning)
+            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
                 setFavourited(false);
                 console.error('Could not favourite post', reason);
             });
     } else {
         setFavourited(false);
-        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unfavourite', 'POST', oauthToken)
-            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost))
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unfavourite', 'POST', oauthToken, hideNonExistWarning)
+            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
                     setFavourited(true);
                     console.error('Could not unfavourite post', reason);
@@ -95,19 +97,19 @@ export const handleFavouriteClick = (setPosts, oauthToken, instanceInfo, readPos
     }
 };
 
-export const handleReblogClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, reblogged, setReblogged) => {
+export const handleReblogClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, reblogged, setReblogged, hideNonExistWarning = false) => {
     if (reblogged === false) {
         setReblogged(true);
-        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/reblog', 'POST', oauthToken)
-            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost))
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/reblog', 'POST', oauthToken, hideNonExistWarning)
+            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
                 setReblogged(false);
                 console.error('Could not reblog post', reason);
             });
     } else {
         setReblogged(false);
-        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unreblog', 'POST', oauthToken)
-            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost))
+        callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unreblog', 'POST', oauthToken, hideNonExistWarning)
+            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
                 setReblogged(true);
                 console.error('Could not unreblog post', reason);

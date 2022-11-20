@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import PropTypes from 'prop-types';
-import CenteredAppText from './CenteredAppText';
+import CenteredAppText from './styled/CenteredAppText';
 
 const TopBarContainer = styled.View`
   margin-top: 0;

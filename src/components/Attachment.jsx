@@ -1,4 +1,4 @@
-import AppText from './AppText';
+import AppText from './styled/AppText';
 import HTMLStyleImage from './HTMLStyleImage';
 import styled from 'styled-components/native';
 

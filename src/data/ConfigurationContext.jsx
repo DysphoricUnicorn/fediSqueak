@@ -1,6 +1,6 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AppText from '../components/AppText';
+import AppText from '../components/styled/AppText';
 
 const Context = React.createContext({});
 Context.displayName = 'ConfigurationContext';

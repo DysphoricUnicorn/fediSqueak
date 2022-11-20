@@ -1,4 +1,4 @@
-import AppText from '../components/AppText';
+import AppText from '../components/styled/AppText';
 import {Button} from 'react-native';
 import styled from 'styled-components/native';
 import {callApi} from '../helpers/apiHelper';
