@@ -3,7 +3,8 @@ import {Button} from 'react-native';
 import styled from 'styled-components/native';
 import {callApi} from '../helpers/apiHelper';
 import PropTypes from 'prop-types';
-import {decodeHtmlEntities} from '../helpers/generalHelpers';
+import {decodeHtmlEntities} from '../helpers/postHelpers';
+import React from 'react';
 
 const InstanceLogo = styled.Image`
   width: 50px;
@@ -18,7 +19,7 @@ const Login = (props) => {
             .then((registeredApplication) => {
                 setRegisteredApp({registered: true, ...registeredApplication});
             })
-            .catch((error) => console.log(error));
+            .catch(error => console.log(error));
     };
 
     return <>
