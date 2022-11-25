@@ -18,6 +18,11 @@ impossible to just run `npm install`, you will need to add `--force`, which shou
 
 Most clients available for mobile devices are made primarily for use with Mastodon. This leads to annoying bugs when encountering the things
 that GoToSocial does differently than Mastodon.  
+I also want a couple of features in my client that others don't care enough about to implement.
+
+Once the project is production ready, I also want to include features that only some fedi backends have and
+hide them behind feature gates.  
+This could potentially make this the first intentional multi backend app for the fediverse.
 
 ## Naming
 
