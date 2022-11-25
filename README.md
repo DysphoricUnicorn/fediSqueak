@@ -18,8 +18,6 @@ impossible to just run `npm install`, you will need to add `--force`, which shou
 
 Most clients available for mobile devices are made primarily for use with Mastodon. This leads to annoying bugs when encountering the things
 that GoToSocial does differently than Mastodon.  
-Also, my favourite Mastodon client seems to no longer be in active development, so I can not hope that its developer fixes any bugs in it,
-no matter if they relate to GoToSocial or not.
 
 ## Naming
 
