@@ -21,33 +21,38 @@ export const ConfigurationProvider = (props) => {
             oauthToken: newOauthToken,
         });
 
-        return AsyncStorage.setItem('stored_data', newStoredData).catch((reason) => {
-            console.warn('Could not store data', reason);
-        });
+        return AsyncStorage.setItem('stored_data', newStoredData)
+            .catch((reason) => {
+                console.warn('Could not store data', reason);
+            });
     }
 
     function setInstance(newInstance) {
-        updateStoredData(newInstance, instanceInfo, registeredApp, oauthToken).then(() => {
-            _setInstance(newInstance);
-        });
+        updateStoredData(newInstance, instanceInfo, registeredApp, oauthToken)
+            .then(() => {
+                _setInstance(newInstance);
+            });
     }
 
     function setInstanceInfo(newInstanceInfo) {
-        updateStoredData(instance, newInstanceInfo, registeredApp, oauthToken).then(() => {
-            _setInstanceInfo(newInstanceInfo);
-        });
+        updateStoredData(instance, newInstanceInfo, registeredApp, oauthToken)
+            .then(() => {
+                _setInstanceInfo(newInstanceInfo);
+            });
     }
 
     function setRegisteredApp(newRegisteredApp) {
-        updateStoredData(instance, instanceInfo, newRegisteredApp, oauthToken).then(() => {
-            _setRegisteredApp(newRegisteredApp);
-        });
+        updateStoredData(instance, instanceInfo, newRegisteredApp, oauthToken)
+            .then(() => {
+                _setRegisteredApp(newRegisteredApp);
+            });
     }
 
     function setOauthToken(newOauthToken) {
-        updateStoredData(instance, instanceInfo, registeredApp, newOauthToken).then(() => {
-            _setOauthToken(newOauthToken);
-        });
+        updateStoredData(instance, instanceInfo, registeredApp, newOauthToken)
+            .then(() => {
+                _setOauthToken(newOauthToken);
+            });
     }
 
     React.useEffect(() => {
@@ -60,7 +65,6 @@ export const ConfigurationProvider = (props) => {
                     _setRegisteredApp(json.registeredApp);
                     _setOauthToken(json.oauthToken);
                 } else {
-                    console.log(Boolean(json?.instance), Boolean(json?.instanceInfo), Boolean(json?.registeredApp), Boolean(json?.oauthToken));
                     return Promise.reject('stored data missing field(s)');
                 }
             })

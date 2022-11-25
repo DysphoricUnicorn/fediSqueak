@@ -120,7 +120,7 @@ const Notifications = (props) => {
                   onRefresh={handleRefresh}
                   onEndReached={handleLoadMore}
                   onEndReachedThreshold={0.7}
-                  keyExtractor={(notification) => notification.id}
+                  keyExtractor={notification => notification.id}
                   ListEmptyComponent={<AppText>No notifications found</AppText>}/>
     </>;
 };

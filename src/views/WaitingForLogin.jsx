@@ -25,9 +25,11 @@ const WaitingForLogin = (props) => {
 
     React.useEffect(() => {
         if (request !== null) {
-            promptAsync().then((response) => {
+            promptAsync()
+            .then((response) => {
                 console.log('Got auth code', response);
-            }).catch((reason) => {
+            })
+            .catch((reason) => {
                 console.log('login failed', reason);
                 setFailure(true);
             });

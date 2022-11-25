@@ -65,18 +65,21 @@ const ContentBase = (props) => {
 
         _setPosts(newPosts);
         if (persist && newPosts !== undefined) {
-            AsyncStorage.setItem('posts' + currentTl, JSON.stringify(newPosts)).catch((reason) => {
-                console.error('Could not store posts', reason);
-            });
+            AsyncStorage.setItem('posts' + currentTl, JSON.stringify(newPosts))
+                .catch((reason) => {
+                    console.error('Could not store posts', reason);
+                });
         }
     };
 
     React.useEffect(() => {
-        callAuthenticated(instanceInfo.uri, '/api/v1/accounts/verify_credentials', 'GET', oauthToken).then((result) => {
-            setAccount(result);
-        }).catch(async (reason) => {
-            console.log(await reason.json());
-        });
+        callAuthenticated(instanceInfo.uri, '/api/v1/accounts/verify_credentials', 'GET', oauthToken)
+            .then((result) => {
+                setAccount(result);
+            })
+            .catch(async (reason) => {
+                console.log(await reason.json());
+            });
     }, []);
 
     return <MenuProvider>
@@ -86,7 +89,7 @@ const ContentBase = (props) => {
                           instanceInfo={instanceInfo}
                           account={account}
                           timelineScrollPosition={timelineScrollPosition}
-                          setTimelineScrollPosition={(newPos) => timelineScrollPosition.current = newPos}
+                          setTimelineScrollPosition={newPos => timelineScrollPosition.current = newPos}
                           posts={posts}
                           setPosts={setPosts}
                           currentTl={currentTl}

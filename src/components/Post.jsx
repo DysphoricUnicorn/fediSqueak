@@ -104,7 +104,9 @@ const Post = (props) => {
                 </InteractionText>
             </InteractionPressable>
             <InteractionPressable
-                onPress={() => handleFavouriteClick(setPosts, oauthToken, instanceInfo, readPost, post, favourited, setFavourited, hideNonExistWaning)}>
+                onPress={() =>
+                    handleFavouriteClick(setPosts, oauthToken, instanceInfo, readPost, post, favourited, setFavourited, hideNonExistWaning)}
+            >
                 <InteractionText active={favourited}>
                     {favourited ? <MaterialIcon size={15} name="star" color="#ff00ff"/> :
                         <MaterialIcon size={15} name="star-outline" color="white"/>} Favourite
@@ -112,7 +114,8 @@ const Post = (props) => {
             </InteractionPressable>
             {readPost.visibility !== 'private' &&
                 <InteractionPressable
-                    onPress={() => handleReblogClick(setPosts, oauthToken, instanceInfo, readPost, post, reblogged, setReblogged, hideNonExistWaning)}>
+                    onPress={() =>
+                        handleReblogClick(setPosts, oauthToken, instanceInfo, readPost, post, reblogged, setReblogged, hideNonExistWaning)}>
                     <InteractionText active={reblogged}>
                         <MaterialIcon size={15} name="repeat" color={reblogged ? '#ff00ff' : 'white'}/>
                         Boost

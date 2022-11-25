@@ -3,6 +3,7 @@ import Login from './Login';
 import InstanceSelection from './InstanceSelection';
 import {useConfigurationContext} from '../data/ConfigurationContext';
 import ContentBase from '../components/ContentBase';
+import React from 'react';
 
 const Root = () => {
     const {

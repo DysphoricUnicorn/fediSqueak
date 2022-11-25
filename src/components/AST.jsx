@@ -16,8 +16,8 @@ const ParagraphOuter = styled.View`
 const Paragraph = (props) => {
     return <ParagraphOuter>
         <Text>{props.children}</Text>
-    </ParagraphOuter>
-}
+    </ParagraphOuter>;
+};
 
 const Italic = styled(PostText)`
   font-style: italic;
@@ -33,7 +33,8 @@ const ColoredLink = styled(PostText)`
 
 export const Link = (props) => {
     const handleLinkPress = () => {
-        Linking.openURL(props.href).catch((reason) => console.error('could not open link', reason));
+        Linking.openURL(props.href)
+            .catch(reason => console.error('could not open link', reason));
     };
 
     if (props?.href) {
@@ -76,7 +77,7 @@ const AST = (props) => {
     }
 
     const tagProps = allowsAttributes ? parsed.attrs : {};
-    const childOfA = props.childOfA || parsed.name === 'a'
+    const childOfA = props.childOfA || parsed.name === 'a';
 
     return <Tag {...tagProps}>
         {parsed.children.map((child, index) => <React.Fragment key={index}>

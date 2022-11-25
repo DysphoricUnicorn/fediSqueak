@@ -48,11 +48,11 @@ export const decodeHtmlEntities = (str) => {
             ?.replace(/&#(\d+);/g, (match, dec) => {
                 return String.fromCharCode(dec);
             }))
-            .replace(/&quot;/g, '"')
-            .replace(/&apos;/g, '\'')
-            .replace(/&amp;/g, '&')
-            .replace(/&gt;/g, '>')
-            .replace(/&lt;/g, '<')
+            ?.replace(/&quot;/g, '"')
+            ?.replace(/&apos;/g, '\'')
+            ?.replace(/&amp;/g, '&')
+            ?.replace(/&gt;/g, '>')
+            ?.replace(/&lt;/g, '<')
         ?? '';
 };
 
@@ -76,11 +76,20 @@ export const updatePost = (updatedPost, direct = false, setPosts, mainPost, hide
     });
 };
 
-export const handleFavouriteClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, favourited, setFavourited, hideNonExistWarning = false) => {
+export const handleFavouriteClick = (
+    setPosts,
+    oauthToken,
+    instanceInfo,
+    readPost,
+    mainPost,
+    favourited,
+    setFavourited,
+    hideNonExistWarning = false,
+) => {
     if (favourited === false) {
         setFavourited(true);
         callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/favourite', 'POST', oauthToken, hideNonExistWarning)
-            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost, hideNonExistWarning))
+            .then(updatedPost => updatePost(updatedPost, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
                 setFavourited(false);
                 console.error('Could not favourite post', reason);
@@ -88,20 +97,27 @@ export const handleFavouriteClick = (setPosts, oauthToken, instanceInfo, readPos
     } else {
         setFavourited(false);
         callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unfavourite', 'POST', oauthToken, hideNonExistWarning)
-            .then((updatedPost) => updatePost(updatedPost, false, setPosts, mainPost, hideNonExistWarning))
+            .then(updatedPost => updatePost(updatedPost, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
-                    setFavourited(true);
-                    console.error('Could not unfavourite post', reason);
-                },
-            );
+                setFavourited(true);
+                console.error('Could not unfavourite post', reason);
+            });
     }
 };
 
-export const handleReblogClick = (setPosts, oauthToken, instanceInfo, readPost, mainPost, reblogged, setReblogged, hideNonExistWarning = false) => {
+export const handleReblogClick = (setPosts,
+                                  oauthToken,
+                                  instanceInfo,
+                                  readPost,
+                                  mainPost,
+                                  reblogged,
+                                  setReblogged,
+                                  hideNonExistWarning = false,
+) => {
     if (reblogged === false) {
         setReblogged(true);
         callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/reblog', 'POST', oauthToken, hideNonExistWarning)
-            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost, hideNonExistWarning))
+            .then(updatedPost => updatePost(updatedPost.reblog, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
                 setReblogged(false);
                 console.error('Could not reblog post', reason);
@@ -109,7 +125,7 @@ export const handleReblogClick = (setPosts, oauthToken, instanceInfo, readPost, 
     } else {
         setReblogged(false);
         callAuthenticated(instanceInfo.uri, '/api/v1/statuses/' + readPost.id + '/unreblog', 'POST', oauthToken, hideNonExistWarning)
-            .then((updatedPost) => updatePost(updatedPost.reblog, false, setPosts, mainPost, hideNonExistWarning))
+            .then(updatedPost => updatePost(updatedPost.reblog, false, setPosts, mainPost, hideNonExistWarning))
             .catch((reason) => {
                 setReblogged(true);
                 console.error('Could not unreblog post', reason);

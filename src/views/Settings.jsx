@@ -12,7 +12,7 @@ const Settings = (props) => {
             .then(() => AsyncStorage.setItem('postslocal', '[]'))
             .then(() => AsyncStorage.setItem('postsfederated', '[]'))
             .then(() => setPosts([]))
-            .catch((reason) => console.error('Cache clearing failed', reason))
+            .catch(reason => console.error('Cache clearing failed', reason))
             .finally(() => setClearing(false));
     };
 

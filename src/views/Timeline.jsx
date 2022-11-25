@@ -37,33 +37,37 @@ const Timeline = (props) => {
     const tlScroll = React.useRef();
 
     React.useEffect(() => {
-        AsyncStorage.getItem('previousLast' + currentTl).then((item) => setPreviousLast(item));
+        AsyncStorage.getItem('previousLast' + currentTl)
+            .then(item => setPreviousLast(item));
     }, [currentTl]);
 
     React.useEffect(() => {
         if (posts.length === 0) {
-            AsyncStorage.getItem('posts' + currentTl).then((oldPosts) => {
-                if (oldPosts) {
-                    setPosts(JSON.parse(oldPosts), false);
-                } else {
-                    return Promise.reject();
-                }
-            }).catch(() => {
-                callAuthenticated(instanceInfo.uri, '/api/v1/timelines/home?limit=20', 'GET', oauthToken)
-                    .then((newPosts) => {
-                        if (newPosts) {
-                            setPosts(newPosts);
-                        } else {
-                            return Promise.reject('No posts returned');
-                        }
-                    })
-                    .catch((reason) => {
-                        console.warn('Could not fetch posts', reason);
-                    });
-            }).finally(() => {
-                setRefreshing(false);
-                setLoadingMore(false);
-            });
+            AsyncStorage.getItem('posts' + currentTl)
+                .then((oldPosts) => {
+                    if (oldPosts) {
+                        setPosts(JSON.parse(oldPosts), false);
+                    } else {
+                        return Promise.reject();
+                    }
+                })
+                .catch(() => {
+                    callAuthenticated(instanceInfo.uri, '/api/v1/timelines/home?limit=20', 'GET', oauthToken)
+                        .then((newPosts) => {
+                            if (newPosts) {
+                                setPosts(newPosts);
+                            } else {
+                                return Promise.reject('No posts returned');
+                            }
+                        })
+                        .catch((reason) => {
+                            console.warn('Could not fetch posts', reason);
+                        });
+                })
+                .finally(() => {
+                    setRefreshing(false);
+                    setLoadingMore(false);
+                });
         } else {
             setRefreshing(false);
             // We need to push the scrollToOffset call to the bottom of the execution stack to avoid a race condition when the TL is there but not rendered yet
@@ -98,9 +102,10 @@ const Timeline = (props) => {
                 const newPreviousLastId = fetchedPosts[fetchedPosts.length - 1]?.id;
                 setPreviousLast(newPreviousLastId);
                 if (newPreviousLastId) {
-                    AsyncStorage.setItem('previousLast' + currentTl, fetchedPosts[fetchedPosts.length - 1]?.id).catch((reason => {
-                        console.error('Could not set previousLast', reason);
-                    }));
+                    AsyncStorage.setItem('previousLast' + currentTl, fetchedPosts[fetchedPosts.length - 1]?.id)
+                        .catch(((reason) => {
+                            console.error('Could not set previousLast', reason);
+                        }));
                 } else {
                     AsyncStorage.removeItem('previousLast' + currentTl)
                         .catch((reason => console.error('could not remote previousLast', reason)));
@@ -147,19 +152,19 @@ const Timeline = (props) => {
 
     const renderPost = ({item, index}) => {
         const post = item;
-        const renderPost = <Post post={post}
+        const postToRender = <Post post={post}
                                  instanceInfo={instanceInfo}
                                  oauthToken={oauthToken}
                                  setPosts={setPosts}/>;
         if (post.id === previousLast && index !== posts.length - 1) {
             return <React.Fragment>
-                {renderPost}
+                {postToRender}
                 <Button title="Load more"
                         onPress={() => handleLoadMore(post.id, sortedPosts?.[index + 1]?.id)}
                         disabled={loadingMore}/>
             </React.Fragment>;
         }
-        return renderPost;
+        return postToRender;
     };
 
     const getItemLayout = (data, index) => {
