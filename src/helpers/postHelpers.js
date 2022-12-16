@@ -105,14 +105,15 @@ export const handleFavouriteClick = (
     }
 };
 
-export const handleReblogClick = (setPosts,
-                                  oauthToken,
-                                  instanceInfo,
-                                  readPost,
-                                  mainPost,
-                                  reblogged,
-                                  setReblogged,
-                                  hideNonExistWarning = false,
+export const handleReblogClick = (
+    setPosts,
+    oauthToken,
+    instanceInfo,
+    readPost,
+    mainPost,
+    reblogged,
+    setReblogged,
+    hideNonExistWarning = false,
 ) => {
     if (reblogged === false) {
         setReblogged(true);

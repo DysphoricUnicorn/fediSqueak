@@ -18,7 +18,7 @@ import SignUpNotification from '../components/notificationTypes/SignUpNotificati
 import ReportNotification from '../components/notificationTypes/ReportNotification';
 
 const Notifications = (props) => {
-    const {instanceInfo, notifications, setNotifications, oauthToken, setPosts, account} = props;
+    const {instanceInfo, notifications, setNotifications, oauthToken, setPosts, account, notificationScroll} = props;
     const [refreshing, setRefreshing] = React.useState(true);
 
     React.useEffect(() => {
@@ -115,6 +115,7 @@ const Notifications = (props) => {
                 Icon={<MaterialIcon size={50} name="notifications" style={{color: 'white'}}/>}
                 SubMenu={<></>}/>
         <FlatList data={notifications}
+                  ref={ref => notificationScroll.current = ref}
                   renderItem={renderItem}
                   refreshing={refreshing}
                   onRefresh={handleRefresh}
@@ -131,6 +132,8 @@ Notifications.propTypes = {
     setNotifications: PropTypes.func.isRequired,
     oauthToken: PropTypes.string.isRequired,
     setPosts: PropTypes.func.isRequired,
+    account: PropTypes.object.isRequired,
+    notificationScroll: PropTypes.object.isRequired,
 };
 
 export default Notifications;

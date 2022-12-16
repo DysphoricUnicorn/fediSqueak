@@ -28,13 +28,12 @@ const Timeline = (props) => {
         setTimelineScrollPosition,
         currentTl,
         setCurrentTl,
+        tlScroll,
     } = props;
 
     const [refreshing, setRefreshing] = React.useState(true);
     const [loadingMore, setLoadingMore] = React.useState(true);
     const [previousLast, setPreviousLast] = React.useState();
-
-    const tlScroll = React.useRef();
 
     React.useEffect(() => {
         AsyncStorage.getItem('previousLast' + currentTl)
@@ -153,9 +152,9 @@ const Timeline = (props) => {
     const renderPost = ({item, index}) => {
         const post = item;
         const postToRender = <Post post={post}
-                                 instanceInfo={instanceInfo}
-                                 oauthToken={oauthToken}
-                                 setPosts={setPosts}/>;
+                                   instanceInfo={instanceInfo}
+                                   oauthToken={oauthToken}
+                                   setPosts={setPosts}/>;
         if (post.id === previousLast && index !== posts.length - 1) {
             return <React.Fragment>
                 {postToRender}
@@ -203,6 +202,13 @@ Timeline.propTypes = {
     account: PropTypes.object,
     oauthToken: PropTypes.string.isRequired,
     instanceInfo: PropTypes.object.isRequired,
+    posts: PropTypes.array.isRequired,
+    setPosts: PropTypes.func.isRequired,
+    timelineScrollPosition: PropTypes.object.isRequired,
+    setTimelineScrollPosition: PropTypes.func.isRequired,
+    currentTl: PropTypes.string.isRequired,
+    setCurrentTl: PropTypes.func.isRequired,
+    tlScroll: PropTypes.object.isRequired,
 };
 
 const TimelineMenuOptionText = styled(AppText)`

@@ -9,15 +9,16 @@ export const ConfigurationProvider = (props) => {
     const [instance, _setInstance] = React.useState('https://fedi.dysphoric.space');
     const [instanceInfo, _setInstanceInfo] = React.useState({fetched: false});
     const [registeredApp, _setRegisteredApp] = React.useState({registered: false});
+    const [appSettings, _setAppSettings] = React.useState({});
     const [oauthToken, _setOauthToken] = React.useState('');
     const [loading, setLoading] = React.useState(true);
 
-    function updateStoredData(newInstance, newInstanceInfo, newRegisteredApp, newOauthToken) {
+    function updateStoredData(newInstance, newInstanceInfo, newRegisteredApp, newOauthToken, newAppSettings) {
         const newStoredData = JSON.stringify({
             instance: newInstance,
             instanceInfo: newInstanceInfo,
             registeredApp: newRegisteredApp,
-
+            appSettings: newAppSettings,
             oauthToken: newOauthToken,
         });
 
@@ -28,30 +29,37 @@ export const ConfigurationProvider = (props) => {
     }
 
     function setInstance(newInstance) {
-        updateStoredData(newInstance, instanceInfo, registeredApp, oauthToken)
+        updateStoredData(newInstance, instanceInfo, registeredApp, oauthToken, appSettings)
             .then(() => {
                 _setInstance(newInstance);
             });
     }
 
     function setInstanceInfo(newInstanceInfo) {
-        updateStoredData(instance, newInstanceInfo, registeredApp, oauthToken)
+        updateStoredData(instance, newInstanceInfo, registeredApp, oauthToken, appSettings)
             .then(() => {
                 _setInstanceInfo(newInstanceInfo);
             });
     }
 
     function setRegisteredApp(newRegisteredApp) {
-        updateStoredData(instance, instanceInfo, newRegisteredApp, oauthToken)
+        updateStoredData(instance, instanceInfo, newRegisteredApp, oauthToken, appSettings)
             .then(() => {
                 _setRegisteredApp(newRegisteredApp);
             });
     }
 
     function setOauthToken(newOauthToken) {
-        updateStoredData(instance, instanceInfo, registeredApp, newOauthToken)
+        updateStoredData(instance, instanceInfo, registeredApp, newOauthToken, appSettings)
             .then(() => {
                 _setOauthToken(newOauthToken);
+            });
+    }
+
+    function setAppSettings(newAppSettings) {
+        updateStoredData(instance, instanceInfo, registeredApp, oauthToken, newAppSettings)
+            .then(() => {
+                _setAppSettings(newAppSettings);
             });
     }
 
@@ -64,6 +72,7 @@ export const ConfigurationProvider = (props) => {
                     _setInstanceInfo(json.instanceInfo);
                     _setRegisteredApp(json.registeredApp);
                     _setOauthToken(json.oauthToken);
+                    _setAppSettings(json.appSettings ?? {});
                 } else {
                     return Promise.reject('stored data missing field(s)');
                 }
@@ -85,6 +94,8 @@ export const ConfigurationProvider = (props) => {
         setRegisteredApp,
         oauthToken,
         setOauthToken,
+        appSettings,
+        setAppSettings,
     };
 
     return <Context.Provider value={value}>{loading ? <AppText>Loading app...</AppText> : props.children}</Context.Provider>;

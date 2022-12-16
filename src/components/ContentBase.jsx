@@ -8,6 +8,8 @@ import {MenuProvider} from 'react-native-popup-menu';
 import Settings from '../views/Settings';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notifications from '../views/Notifications';
+import {AccessibilityInfo, Alert} from 'react-native';
+import {useConfigurationContext} from '../data/ConfigurationContext';
 
 const BottomBarContainer = styled.View`
   margin-top: auto;
@@ -50,12 +52,15 @@ const BottomBarIcon = (props) => {
 
 const ContentBase = (props) => {
     const {oauthToken, instanceInfo} = props;
+    const {appSettings, setAppSettings} = useConfigurationContext();
     const [notifications, setNotifications] = React.useState([]);
     const [currentView, setCurrentView] = React.useState('home');
     const [currentTl, setCurrentTl] = React.useState('home');
     const [account, setAccount] = React.useState();
     const timelineScrollPosition = React.useRef();
     const [posts, _setPosts] = React.useState([]);
+    const tlScroll = React.useRef();
+    const notificationScroll = React.useRef();
 
     const setPosts = (newPosts, persist = true) => {
         // Allow functions to be passed instead of a new value, just like regular react state update functions allow
@@ -82,6 +87,49 @@ const ContentBase = (props) => {
             });
     }, []);
 
+    const scrollFlatListToTop = async (viewScrollRef) => {
+        const dontAnimate = await AccessibilityInfo.isReduceMotionEnabled();
+        viewScrollRef.current?.scrollToIndex({
+            animated: !dontAnimate,
+            index: 0,
+            viewOffset: 0,
+            viewPosition: 0,
+        });
+    };
+
+    const handleScrollableNavigationPress = (viewName, viewScrollRef) => {
+        if (currentView === viewName) {
+            if (appSettings.scrollTopWarn ?? true) {
+                Alert.alert(
+                    'Scroll to top?',
+                    'Do you want to scroll your current view to its top?\n(You can disable this popup in the settings)',
+                    [
+                        {
+                            text: 'Yes',
+                            onPress: () => scrollFlatListToTop(viewScrollRef),
+                        },
+                        {
+                            text: 'No',
+                            cancelable: true,
+                        },
+                    ],
+                );
+            } else {
+                scrollFlatListToTop(viewScrollRef);
+            }
+        } else {
+            setCurrentView(viewName);
+        }
+    };
+
+    const handleHomePress = () => {
+        handleScrollableNavigationPress('home', tlScroll);
+    };
+
+    const handleNotificationsPress = () => {
+        handleScrollableNavigationPress('notifications', notificationScroll);
+    };
+
     return <MenuProvider>
         <MainContentView>
             {currentView === 'home' &&
@@ -93,19 +141,21 @@ const ContentBase = (props) => {
                           posts={posts}
                           setPosts={setPosts}
                           currentTl={currentTl}
-                          setCurrentTl={setCurrentTl}/>
+                          setCurrentTl={setCurrentTl}
+                          tlScroll={tlScroll}/>
                 || currentView === 'notifications' && <Notifications instanceInfo={instanceInfo}
                                                                      notifications={notifications}
                                                                      setNotifications={setNotifications}
                                                                      oauthToken={oauthToken}
                                                                      account={account}
-                                                                     setPosts={setPosts}/>
-                || currentView === 'settings' && <Settings setPosts={_setPosts}/>}
+                                                                     setPosts={setPosts}
+                                                                     notificationScroll={notificationScroll}/>
+                || currentView === 'settings' && <Settings setPosts={_setPosts} appSettings={appSettings} setAppSettings={setAppSettings}/>}
         </MainContentView>
         <BottomBarContainer>
-            <BottomBarIcon borderRadius={0} name="home" onPress={() => setCurrentView('home')}>Home</BottomBarIcon>
+            <BottomBarIcon borderRadius={0} name="home" onPress={handleHomePress}>Home</BottomBarIcon>
             <BottomBarIcon borderRadius={0} name="notifications"
-                           onPress={() => setCurrentView('notifications')}>Notifications</BottomBarIcon>
+                           onPress={handleNotificationsPress}>Notifications</BottomBarIcon>
             <BottomBarIcon borderRadius={0} name="settings" onPress={() => setCurrentView('settings')}>Settings</BottomBarIcon>
         </BottomBarContainer>
     </MenuProvider>;
