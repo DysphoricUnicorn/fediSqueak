@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import AppText from './styled/AppText';
-import {Button, View} from 'react-native';
+import {Button, Pressable, View} from 'react-native';
 import {parsePost} from '../helpers/generalHelpers';
 import React from 'react';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
@@ -16,6 +16,10 @@ import DisplayNameText from './styled/DisplayNameText';
 import UserNameText from './styled/UserNameText';
 import PostTimeStamp from './styled/PostTimeStamp';
 import RebloggerText from './styled/RebloggerText';
+import {BlurView} from 'expo-blur';
+import {useConfigurationContext} from '../data/ConfigurationContext';
+import FunctionalBlurView from './styled/FunctionalBlurView';
+import CNText from './styled/CNText';
 
 const PostInteractionView = styled.View`
   flex-direction: row;
@@ -54,6 +58,7 @@ const Post = (props) => {
     const [cnShown, setCnShown] = React.useState(post.cnShown ?? !readPost.spoiler_text);
     const [favourited, setFavourited] = React.useState(readPost.favourited);
     const [reblogged, setReblogged] = React.useState(readPost.reblogged);
+    const {appSettings} = useConfigurationContext();
 
     const postCreationTime = new Date(readPost.created_at);
 
@@ -81,20 +86,17 @@ const Post = (props) => {
             </NameContainer>
         </MetadataContainer>
         <View>
-            {readPost.spoiler_text && <>
-                <PostText accessibilityLanguage={readPost.language}>{parsePost(readPost.spoiler_text, readPost.emojis)}</PostText>
-                <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>
-            </>}
-            {cnShown && <>
-                <PostContentView>
-                    <PostText selectable={post.visibility !== 'private'}>
-                        {parsePost(readPost.content, readPost.emojis)}
-                    </PostText>
-                    {Boolean(readPost.media_attachments) && <AttachmentContainer>
-                        {readPost.media_attachments.map((attachment, index) => <Attachment key={index} attachment={attachment}/>)}
-                    </AttachmentContainer>}
-                </PostContentView>
-            </>}
+            {readPost.spoiler_text && <Pressable onPress={() => setCnShown(old => !old)}>
+                <CNText accessibilityLanguage={readPost.language}>{parsePost(readPost.spoiler_text, readPost.emojis, true)}</CNText>
+                {appSettings.completelyHideCNs && <Button onPress={() => setCnShown(old => !old)} title={cnShown ? 'Hide post' : 'Show post'}/>}
+            </Pressable>}
+            {cnShown
+                ? <PostContent post={post} readPost={readPost}/>
+                : !appSettings.completelyHideCNs && <Pressable onPress={() => setCnShown(true)}>
+                    <PostContent post={post} readPost={readPost}/>
+                    <FunctionalBlurView intensity={80} tint="dark"/>
+                </Pressable>
+            }
         </View>
         <PostInteractionView>
             <InteractionPressable onPress={() => console.log('not implemented')}>
@@ -124,6 +126,18 @@ const Post = (props) => {
             }
         </PostInteractionView>
     </PostView>;
+};
+
+const PostContent = (props) => {
+    const {post, readPost} = props;
+    return <PostContentView>
+        <PostText selectable={post.visibility !== 'private'}>
+            {parsePost(readPost.content, readPost.emojis)}
+        </PostText>
+        {Boolean(readPost.media_attachments) && <AttachmentContainer>
+            {readPost.media_attachments.map((attachment, index) => <Attachment key={index} attachment={attachment}/>)}
+        </AttachmentContainer>}
+    </PostContentView>;
 };
 
 export default React.memo(Post);

@@ -11,10 +11,16 @@ const Settings = (props) => {
     const {setPosts, appSettings, setAppSettings} = props;
 
     const [cachedScrollTopWarn, setCachedScrollTopWarn] = React.useState(appSettings.scrollTopWarn ?? true);
+    const [cachedCompletelyHideCNs, setCachedCompletelyHideCNs] = React.useState(appSettings.completelyHideCNs ?? false);
 
     const handleScrollTopWarnChange = () => {
         setAppSettings({...appSettings, scrollTopWarn: !cachedScrollTopWarn});
         setCachedScrollTopWarn(!cachedScrollTopWarn);
+    };
+
+    const handleCompletelyHideCNsChange = () => {
+        setAppSettings({...appSettings, completelyHideCNs: !cachedCompletelyHideCNs});
+        setCachedCompletelyHideCNs(!cachedCompletelyHideCNs);
     };
 
     const deleteCache = () => {
@@ -36,6 +42,12 @@ const Settings = (props) => {
             </SettingsSwitchTextContainer>
             <SettingsSwitchSwitchContainer>
                 <Switch value={cachedScrollTopWarn} onValueChange={handleScrollTopWarnChange}/>
+            </SettingsSwitchSwitchContainer>
+            <SettingsSwitchTextContainer>
+                <AppText>Completely hide post content if CN is not expanded rather than just blur the content</AppText>
+            </SettingsSwitchTextContainer>
+            <SettingsSwitchSwitchContainer>
+                <Switch value={cachedCompletelyHideCNs} onValueChange={handleCompletelyHideCNsChange}/>
             </SettingsSwitchSwitchContainer>
         </SettingsSwitchesContainer>
     </>;

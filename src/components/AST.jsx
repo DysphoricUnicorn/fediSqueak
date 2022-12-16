@@ -4,6 +4,7 @@ import {Linking, Text} from 'react-native';
 import Emojo from './Emojo';
 import PostText from './styled/PostText';
 import {decodeHtmlEntities} from '../helpers/postHelpers';
+import CNText from './styled/CNText';
 
 const Paragraph = (props) => {
     return <>
@@ -65,7 +66,11 @@ const lookupHtmlTagReactNativeEquivalent = (tagName) => {
 const AST = (props) => {
     const {parsed} = props;
     if (parsed.type === 'text') {
-        const Tag = props.childOfA ? ColoredLink : PostText;
+        const Tag = props.childOfA
+            ? ColoredLink // We can (hopefully) safely assume that anything within a link is not a CN because links in CNs make no sense
+            : props.cn
+                ? CNText
+                : PostText;
         return <Tag>{decodeHtmlEntities(parsed.content)}</Tag>;
     }
 
@@ -80,7 +85,7 @@ const AST = (props) => {
 
     return <Tag {...tagProps}>
         {parsed.children.map((child, index) => <React.Fragment key={index}>
-            <AST parsed={child} childOfA={childOfA} first={false}/>
+            <AST parsed={child} childOfA={childOfA} first={false} cn={props.cn}/>
         </React.Fragment>)}
     </Tag>;
 };
