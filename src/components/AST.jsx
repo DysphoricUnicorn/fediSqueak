@@ -5,18 +5,11 @@ import Emojo from './Emojo';
 import PostText from './styled/PostText';
 import {decodeHtmlEntities} from '../helpers/postHelpers';
 
-const ParagraphOuter = styled.View`
-  margin-top: 5px;
-  margin-bottom: 5px;
-  flex-shrink: 1;
-  flex-direction: column;
-  flex-wrap: nowrap;
-`;
-
 const Paragraph = (props) => {
-    return <ParagraphOuter>
+    return <>
+        {!props.first && '\n'}
         <Text>{props.children}</Text>
-    </ParagraphOuter>;
+    </>;
 };
 
 const Italic = styled(PostText)`
@@ -53,19 +46,19 @@ const LineBreak = () => {
 const lookupHtmlTagReactNativeEquivalent = (tagName) => {
     switch (tagName) {
         case('p'):
-            return [Paragraph, false];
+            return [Paragraph, true, true];
         case('i'):
-            return [Italic, false];
+            return [Italic, false, false];
         case('b'):
-            return [Bold, false];
+            return [Bold, false, false];
         case('a'):
-            return [Link, true];
+            return [Link, true, false];
         case('img'):
-            return [Emojo, true];
+            return [Emojo, true, false];
         case('br'):
-            return [LineBreak, false];
+            return [LineBreak, false, false];
         default:
-            return [React.Fragment, false];
+            return [React.Fragment, false, false];
     }
 };
 
@@ -76,14 +69,18 @@ const AST = (props) => {
         return <Tag>{decodeHtmlEntities(parsed.content)}</Tag>;
     }
 
-    const [Tag, allowsAttributes] = lookupHtmlTagReactNativeEquivalent(parsed.name);
+    const [Tag, allowsAttributes, caresAboutBeingFirst] = lookupHtmlTagReactNativeEquivalent(parsed.name);
 
     const tagProps = allowsAttributes ? parsed.attrs : {};
+    if (caresAboutBeingFirst) {
+        tagProps.first = props.first;
+    }
+
     const childOfA = props.childOfA || parsed.name === 'a';
 
     return <Tag {...tagProps}>
         {parsed.children.map((child, index) => <React.Fragment key={index}>
-            <AST parsed={child} childOfA={childOfA}/>
+            <AST parsed={child} childOfA={childOfA} first={false}/>
         </React.Fragment>)}
     </Tag>;
 };

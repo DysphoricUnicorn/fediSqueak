@@ -9,5 +9,10 @@ export const parsePost = (str, emoji = []) => {
     });
 
     const parsed = HTML.parse(str);
-    return parsed.map((parsedEntry, index) => <AST parsed={parsedEntry} key={index}/>);
+    let first = true;
+    return parsed.map((parsedEntry, index) => {
+        const wasFirst = first;
+        first = false;
+        return <AST parsed={parsedEntry} key={index} first={wasFirst}/>;
+    });
 };
