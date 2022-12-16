@@ -46,6 +46,10 @@ export const Link = (props) => {
     return props.children;
 };
 
+const LineBreak = () => {
+    return <PostText>{'\n'}</PostText>;
+};
+
 const lookupHtmlTagReactNativeEquivalent = (tagName) => {
     switch (tagName) {
         case('p'):
@@ -58,6 +62,8 @@ const lookupHtmlTagReactNativeEquivalent = (tagName) => {
             return [Link, true];
         case('img'):
             return [Emojo, true];
+        case('br'):
+            return [LineBreak, false];
         default:
             return [React.Fragment, false];
     }
@@ -71,10 +77,6 @@ const AST = (props) => {
     }
 
     const [Tag, allowsAttributes] = lookupHtmlTagReactNativeEquivalent(parsed.name);
-
-    if (!parsed.children) {
-        return <React.Fragment>{'\n'}</React.Fragment>;
-    }
 
     const tagProps = allowsAttributes ? parsed.attrs : {};
     const childOfA = props.childOfA || parsed.name === 'a';
