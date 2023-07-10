@@ -11,6 +11,9 @@ import {callAuthenticated} from '../helpers/apiHelper';
 import {Button, FlatList} from 'react-native';
 import Post from '../components/Post';
 import {findPostByOffset, getPostHeight, getPostOffset} from '../helpers/postHelpers';
+import ComposePostButton from '../components/styled/ComposePostButton';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import PostCreationModal from '../components/PostCreationModal';
 
 const OwnProfileImage = styled.Image`
   height: 50px;
@@ -34,6 +37,7 @@ const Timeline = (props) => {
     const [refreshing, setRefreshing] = React.useState(true);
     const [loadingMore, setLoadingMore] = React.useState(true);
     const [previousLast, setPreviousLast] = React.useState();
+    const [composeModalVisible, setComposeModalVisible] = React.useState(false);
 
     React.useEffect(() => {
         AsyncStorage.getItem('previousLast' + currentTl)
@@ -195,6 +199,10 @@ const Timeline = (props) => {
                   windowSize={31}
                   getItemLayout={getItemLayout}
                   ListEmptyComponent={<Button title="Load posts" onPress={() => handleLoadMore()} disabled={loadingMore}/>}/>
+        {!composeModalVisible && <ComposePostButton onPress={() => setComposeModalVisible(true)}>
+            <MaterialCommunityIcons size={25} name="pencil"/>
+        </ComposePostButton>}
+        <PostCreationModal visible={composeModalVisible} setVisible={setComposeModalVisible}/>
     </>;
 };
 

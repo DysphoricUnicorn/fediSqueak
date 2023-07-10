@@ -1,6 +1,6 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Button, Switch, View} from 'react-native';
+import {Button, Switch} from 'react-native';
 import AppText from '../components/styled/AppText';
 import TopBar from '../components/TopBar';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
